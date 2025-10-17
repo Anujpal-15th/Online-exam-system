@@ -4,12 +4,15 @@
 <h2>Questions</h2>
 <div style="margin-bottom:12px;">
   {% if user.is_authenticated and user.user_type == 2 %}<a href="{% url 'add_question' %}">Add New Question</a> |{% endif %}
+  {% if user.is_authenticated and user.user_type == 1 %}<a href="{% url 'add_question' %}">Add New Question</a> |{% endif %}
   <a href="{% url 'leaderboard' %}">Leaderboard</a> |
-  <a href="{% url 'mock_test' %}">Mock Test</a> |
-  <a href="{% url 'student_submissions' %}">My Submissions</a>
+  <a href="{% url 'mock_test' %}">Mock Test</a> 
+  {% if user.is_authenticated and user.user_type == 3 %} | <a href="{% url 'student_submissions' %}">My Submissions</a>{% endif %}
   {% if user.is_authenticated and user.user_type == 2 %} | <a href="{% url 'submissions_list' %}">All Submissions</a> | <a href="{% url 'export_performance_csv' %}">Export CSV</a>{% endif %}
   {% if user.is_authenticated %} | <a href="{% url 'logout' %}">Logout</a>{% endif %}
-  | <a href="{% url 'home' %}">Home</a>
+  {% if user.is_authenticated and user.user_type == 3 %} | <a href="{% url 'student_dashboard' %}">Home</a>{% endif %}
+  {% if user.is_authenticated and user.user_type == 2 %} | <a href="{% url 'teacher_dashboard' %}">Home</a>{% endif %}
+  {% if user.is_authenticated and user.user_type == 1 %} | <a href="{% url 'admin_dashboard' %}">Home</a>{% endif %}
 </div>
 
 <form method="get" style="margin-bottom:12px;">
@@ -43,9 +46,13 @@
     <td>
       {% if user.is_authenticated and user.user_type == 2 %}
         <a href="{% url 'edit_question' question.id %}">Edit</a> |
-        <a href="{% url 'delete_question' question.id %}">Delete</a> |
+        <a href="{% url 'delete_question' question.id %}">Delete</a>
       {% endif %}
-      <a href="{% url 'take_question' question.id %}">Answer</a>
+      {% if user.is_authenticated and user.user_type == 1 %}
+        <a href="{% url 'edit_question' question.id %}">Edit</a> |
+        <a href="{% url 'delete_question' question.id %}">Delete</a>
+      {% endif %}
+      {% if user.is_authenticated and user.user_type == 3 %} | <a href="{% url 'take_question' question.id %}">Answer</a>{% endif %}
     </td>
   </tr>
   {% endfor %}
