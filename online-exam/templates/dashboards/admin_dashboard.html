@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+<ul>
+    <li><a href="{% url 'questions_list' %}">Manage Questions</a></li>
+    <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
+    <li><a href="{% url 'admin_activity' %}">Activity & Reports</a></li>
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+</ul>
+{% endblock %}

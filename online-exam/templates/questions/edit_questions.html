@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Edit Question{% endblock %}
+{% block content %}
+<h2>Edit Question</h2>
+<form method="POST">
+    {% csrf_token %}
+    <textarea name="question_text" rows="5" cols="50" required>{{ question.question_text }}</textarea><br><br>
+    <button type="submit">Update Question</button>
+</form>
+<a href="{% url 'questions_list' %}">Back to Questions List</a>
+{% endblock %}

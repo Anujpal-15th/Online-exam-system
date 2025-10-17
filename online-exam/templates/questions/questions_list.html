@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Questions List{% endblock %}
+{% block content %}
+<h2>Questions</h2>
+<div style="margin-bottom:12px;">
+  {% if user.is_authenticated and user.user_type == 2 %}<a href="{% url 'add_question' %}">Add New Question</a> |{% endif %}
+  <a href="{% url 'leaderboard' %}">Leaderboard</a> |
+  <a href="{% url 'mock_test' %}">Mock Test</a> |
+  <a href="{% url 'student_submissions' %}">My Submissions</a>
+  {% if user.is_authenticated and user.user_type == 2 %} | <a href="{% url 'submissions_list' %}">All Submissions</a> | <a href="{% url 'export_performance_csv' %}">Export CSV</a>{% endif %}
+  {% if user.is_authenticated %} | <a href="{% url 'logout' %}">Logout</a>{% endif %}
+  | <a href="{% url 'home' %}">Home</a>
+</div>
+
+<form method="get" style="margin-bottom:12px;">
+  <input type="text" name="q" placeholder="Search question text" value="{{ request.GET.q }}" />
+  <input type="text" name="subject" placeholder="Subject" value="{{ request.GET.subject }}" />
+  <input type="text" name="topic" placeholder="Topic" value="{{ request.GET.topic }}" />
+  <select name="difficulty">
+    <option value="">Any difficulty</option>
+    <option value="easy" {% if request.GET.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+    <option value="medium" {% if request.GET.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+    <option value="hard" {% if request.GET.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+  </select>
+  <button type="submit">Filter</button>
+</form>
+<table border="1" cellpadding="5">
+  <tr>
+    <th>ID</th>
+    <th>Question</th>
+    <th>Subject</th>
+    <th>Topic</th>
+    <th>Difficulty</th>
+    <th>Actions</th>
+  </tr>
+  {% for question in questions %}
+  <tr>
+    <td>{{ question.id }}</td>
+    <td>{{ question.question_text }}</td>
+    <td>{{ question.subject }}</td>
+    <td>{{ question.topic }}</td>
+    <td>{{ question.difficulty }}</td>
+    <td>
+      {% if user.is_authenticated and user.user_type == 2 %}
+        <a href="{% url 'edit_question' question.id %}">Edit</a> |
+        <a href="{% url 'delete_question' question.id %}">Delete</a> |
+      {% endif %}
+      <a href="{% url 'take_question' question.id %}">Answer</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
+

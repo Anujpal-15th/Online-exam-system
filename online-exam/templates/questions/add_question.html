@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Add Question{% endblock %}
+{% block content %}
+<h2>Add Question</h2>
+<form method="POST">
+  {% csrf_token %}
+  <textarea name="question_text" rows="5" cols="50" placeholder="Enter question" required></textarea><br><br>
+  <input type="text" name="subject" placeholder="Subject" />
+  <input type="text" name="topic" placeholder="Topic" style="margin-left:8px;" />
+  <select name="difficulty" style="margin-left:8px;">
+    <option value="easy">Easy</option>
+    <option value="medium">Medium</option>
+    <option value="hard">Hard</option>
+  </select>
+  <br><br>
+  <button type="submit">Add Question</button>
+  <a href="{% url 'questions_list' %}" style="margin-left:8px;">Cancel</a>
+  </form>
+{% endblock %}
+
