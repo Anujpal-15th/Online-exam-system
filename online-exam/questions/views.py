@@ -44,7 +44,7 @@ def add_question(request):
 
 @login_required
 def edit_question(request, id):
-    if request.user.user_type != 2:
+    if request.user.user_type != 2 and request.user.user_type != 1:
         return redirect('questions_list')
     question = get_object_or_404(Question, id=id)
     if request.method == 'POST':
@@ -58,7 +58,7 @@ def edit_question(request, id):
 
 @login_required
 def delete_question(request, id):
-    if request.user.user_type != 2:
+    if request.user.user_type != 2 and request.user.user_type != 1:
         return redirect('questions_list')
     question = get_object_or_404(Question, id=id)
     question.delete()

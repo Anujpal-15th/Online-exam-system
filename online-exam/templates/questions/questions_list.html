@@ -4,7 +4,6 @@
 <h2>Questions</h2>
 <div style="margin-bottom:12px;">
   {% if user.is_authenticated and user.user_type == 2 %}<a href="{% url 'add_question' %}">Add New Question</a> |{% endif %}
-  {% if user.is_authenticated and user.user_type == 1 %}<a href="{% url 'add_question' %}">Add New Question</a> |{% endif %}
   <a href="{% url 'leaderboard' %}">Leaderboard</a> |
   <a href="{% url 'mock_test' %}">Mock Test</a> 
   {% if user.is_authenticated and user.user_type == 3 %} | <a href="{% url 'student_submissions' %}">My Submissions</a>{% endif %}
