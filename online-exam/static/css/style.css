@@ -198,3 +198,22 @@ h1, h2 {
 .demo-credentials { margin-top: 16px; font-size: 13px; color: #4b5563; }
 .demo-credentials h4 { font-size: 13px; margin-bottom: 6px; color: #111827; }
 .demo-cred { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+
+/* static/css/style.css */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+}
+
+main {
+    min-height: 75vh;
+}
+
+footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
