@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Questions List{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboard-container">
+
+  <!-- Sidebar -->
+  <div class="dashboard-sidebar">
+    <h2>Browse Questions</h2>
+
+    {% if user.is_authenticated %}
+        {% if user.user_type == 3 %}
+            <a href="{% url 'questions_list' %}">Browse Questions</a>
+            <a href="{% url 'student_submissions' %}">My Submissions</a>
+            <a href="{% url 'mock_test' %}">Mock Test</a>
+        {% elif user.user_type == 2 %}
+            <a href="{% url 'questions_list' %}">Manage Questions</a>
+            <a href="{% url 'add_question' %}">Add New Question</a>
+            <a href="{% url 'submissions_list' %}">All Submissions</a>
+            <a href="{% url 'teacher_reports' %}">Performance Reports</a>
+            <a href="{% url 'mock_test' %}">Mock Test</a>
+            <a href="{% url 'export_performance_csv' %}">Export CSV</a>
+        {% elif user.user_type == 1 %}
+            <a href="{% url 'questions_list' %}">Manage Questions</a>
+            <a href="{% url 'admin_users' %}">Manage Users</a>
+            <a href="{% url 'admin_activity' %}">Reports</a>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
+    {% endif %}
+  </div>
+
+  <!-- Main content -->
+  <div class="dashboard-main">
+    <h2>Browse Questions</h2>
+
+    <!-- Search/filter panel -->
+    <!-- Search/filter panel -->
+<div class="search-panel">
+  <form method="get" class="search-form">
+    <input type="text" name="q" placeholder="Search question text" value="{{ request.GET.q }}" />
+    <input type="text" name="subject" placeholder="Subject" value="{{ request.GET.subject }}" />
+    <input type="text" name="topic" placeholder="Topic" value="{{ request.GET.topic }}" />
+
+      <select name="difficulty">
+        <option value="">Any difficulty</option>
+        <option value="easy" {% if request.GET.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+        <option value="medium" {% if request.GET.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+        <option value="hard" {% if request.GET.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+      </select>
+      <button type="submit" title="Filter"><i class="fas fa-filter"></i></button>
+  </form>
+</div>
+
+
+    <table border="1" cellpadding="5">
+      <tr>
+        <th>ID</th>
+        <th>Question</th>
+        <th>Subject</th>
+        <th>Topic</th>
+        <th>Difficulty</th>
+        <th>Actions</th>
+      </tr>
+      {% for question in questions %}
+      <tr>
+        <td>{{ question.id }}</td>
+        <td>{{ question.question_text }}</td>
+        <td>{{ question.subject }}</td>
+        <td>{{ question.topic }}</td>
+        <td>{{ question.difficulty }}</td>
+        <td>
+          {% if user.is_authenticated and user.user_type == 2 %}
+            <a href="{% url 'edit_question' question.id %}">Edit</a> |
+            <a href="{% url 'delete_question' question.id %}">Delete</a>
+          {% endif %}
+          {% if user.is_authenticated and user.user_type == 1 %}
+            <a href="{% url 'edit_question' question.id %}">Edit</a> |
+            <a href="{% url 'delete_question' question.id %}">Delete</a>
+          {% endif %}
+          {% if user.is_authenticated and user.user_type == 3 %} 
+            | <a href="{% url 'take_question' question.id %}">Answer</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}
