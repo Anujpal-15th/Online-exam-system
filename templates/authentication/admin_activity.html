@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Activity & Reports{% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+
+<div class="main-container-wrapper">
+
+    <!-- Sidebar -->
+    <div class="dashboard-sidebar">
+        <h2>Activity & Reports</h2>
+        {% if user.is_authenticated %}
+            {% if user.user_type == 2 %}
+                <a href="{% url 'questions_list' %}">Manage Questions</a>
+                <a href="{% url 'submissions_list' %}">All Submissions</a>
+                <a href="{% url 'teacher_reports' %}">Performance Reports</a>
+                <a href="{% url 'mock_test' %}">Mock Test</a>
+                <a href="{% url 'export_performance_csv' %}">Export CSV</a>
+            {% elif user.user_type == 1 %}
+                <a href="{% url 'questions_list' %}">Manage Questions</a>
+                <a href="{% url 'admin_users' %}">Manage Users</a>
+                <a href="{% url 'admin_activity' %}">Reports</a>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </div>
+
+    <!-- Main content -->
+    <div class="dashboard-main">
+        <h2>Activity & Reports</h2>
+        <p>Total Questions: <strong>{{ questions_count }}</strong></p>
+        <p>Total Submissions: <strong>{{ submissions_count }}</strong></p>
+
+        <h3>Questions by Teacher</h3>
+        <table>
+            <tr><th>Teacher</th><th>Questions</th></tr>
+            {% for row in created_by_teacher %}
+            <tr>
+                <td>{{ row.author__username|default:'(unknown)' }}</td>
+                <td>{{ row.cnt }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">No data</td></tr>
+            {% endfor %}
+        </table>
+
+        <h3>Submissions by Student</h3>
+        <table>
+            <tr><th>Student</th><th>Attempts</th><th>Total</th><th>Average</th></tr>
+            {% for row in submissions_by_student %}
+            <tr>
+                <td>{{ row.student__username }}</td>
+                <td>{{ row.cnt }}</td>
+                <td>{{ row.total|default:0 }}</td>
+                <td>{{ row.avg|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No data</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}
