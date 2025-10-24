@@ -153,3 +153,14 @@ def teacher_reports(request):
         'by_student': by_student,
         'by_question': by_question,
     })
+def dashboard_home(request):
+    # logic to redirect based on user type
+    if request.user.is_authenticated:
+        if request.user.user_type == 1:  # admin
+            return redirect('admin_dashboard')
+        elif request.user.user_type == 2:  # teacher
+            return redirect('teacher_dashboard')
+        else:  # student
+            return redirect('student_dashboard')
+    else:
+        return redirect('login')

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-ek*dm9e*_b)y9*8qoi!g$0x7kz5ti4qt=$p6*s3ww^1i+n_kmq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -89,8 +89,8 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'online_exam_db',
-            'USER': 'anujpal',
-            'PASSWORD': 'p0o9i8u7',
+            'USER': 'navya_db',
+            'PASSWORD': '12341234',
             'HOST': 'localhost',
             'PORT': '5432',
         }

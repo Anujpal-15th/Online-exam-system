@@ -217,3 +217,24 @@ footer {
     bottom: 0;
     width: 100%;
 }
+.navbar-nav .nav-item .nav-link {
+    font-size: 0.85rem;
+    padding: 5px 12px;
+    transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-item .nav-link:hover {
+    color: #ffd700 !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #fff;
+}
+
+.navbar-dark .navbar-nav .nav-link.text-danger {
+    color: #ff6b6b;
+}
+
+.navbar-dark .navbar-nav .nav-link.text-danger:hover {
+    color: #ff4757;
+}
