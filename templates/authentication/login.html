@@ -18,7 +18,7 @@
           <p>E-Assessment Platform</p>
         </div>
 
-        <div class="role-selection">
+        <!-- <div class="role-selection">
           <h3>Select Your Role</h3>
           <div class="role-buttons">
             <button type="button" class="role-btn" data-role="student">
@@ -31,12 +31,17 @@
               <i class="fas fa-user-shield"></i><span>Admin</span>
             </button>
           </div>
-        </div>
+        </div> -->
 
         <form method="post" class="login-form">
           {% csrf_token %}
           {% if error %}
             <p style="color:red; text-align:center;">{{ error }}</p>
+          {% endif %}
+          {% if show_resend %}
+            <div style="text-align:center; margin:8px 0;">
+              <a class="btn btn--primary" href="{% url 'resend_verification' %}">Resend verification email</a>
+            </div>
           {% endif %}
           <input type="hidden" name="role" id="selected-role" />
           <div class="form-group">
@@ -55,6 +60,8 @@
         </form>
 
         <div style="text-align:center; margin-top:12px;">
+          <a href="{% url 'password_reset' %}">Forgot password?</a>
+          <br />
           <a href="{% url 'register' %}">Don't have an account? Register</a>
         </div>
       </div>

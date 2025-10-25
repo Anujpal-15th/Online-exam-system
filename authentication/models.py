@@ -9,3 +9,7 @@ class CustomUser(AbstractUser):
     )
 
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=1)  # default = admin
+    email = models.EmailField(unique=True, blank=False, null=False)
+    
+    def __str__(self):
+        return f"{self.username} ({self.get_user_type_display()})"

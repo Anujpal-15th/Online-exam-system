@@ -78,23 +78,23 @@ WSGI_APPLICATION = 'online_exam_backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # PostgreSQL only. If DATABASE_URL is defined, use it. Otherwise use the explicit Postgres config below.
-if os.environ.get('DATABASE_URL'):
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ['DATABASE_URL'], conn_max_age=600)
+# if os.environ.get('DATABASE_URL'):
+#     DATABASES = {
+#         'default': dj_database_url.parse(os.environ['DATABASE_URL'], conn_max_age=600)
+#     }
+# else:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'neondb',
+        'USER': 'neondb_owner',
+        'PASSWORD': 'npg_nUtmuDqNIe75',
+        'HOST': 'ep-wispy-meadow-a108fkm5.ap-southeast-1.aws.neon.tech',
+        'PORT': 5432,
+        'OPTIONS': {'sslmode': 'require'},
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'online_exam_db',
-            'USER': 'anujpal',
-            'PASSWORD': 'p0o9i8u7',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
-
-
+}
+# Password validation
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -144,4 +144,19 @@ AUTH_USER_MODEL = 'authentication.CustomUser'
 # Ensure login-required views redirect to your login URL instead of the default '/accounts/login/'
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/auth/dashboard/student/'
+
+# Email configuration
+# For development, send emails to console. Override via env vars in production.
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'sout.anujpal@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'ppirnmtyjqedsvxb')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() == 'true'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@online-exam.local')
+
+# Password reset token timeout (in seconds). Default ~3 days if unset.
+from django.conf import global_settings as _gs
+PASSWORD_RESET_TIMEOUT = int(os.environ.get('PASSWORD_RESET_TIMEOUT', getattr(_gs, 'PASSWORD_RESET_TIMEOUT', 259200)))
 

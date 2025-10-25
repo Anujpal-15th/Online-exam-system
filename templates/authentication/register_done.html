@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check your email</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>Email verification sent</h1>
+        <p>We've sent a verification link to {{ email }}. Please check your inbox.</p>
+      </div>
+      <div style="text-align:center;">
+        <a class="btn btn--primary" href="{% url 'login' %}">Back to Login</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
