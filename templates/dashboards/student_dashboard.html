@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<div class="dashboard-container">
+
+  <!-- Sidebar -->
+  <div class="dashboard-sidebar">
+    <h2>Student Dashboard</h2>
+    <a href="{% url 'questions_list' %}">Browse Questions</a>
+    <a href="{% url 'student_submissions' %}">My Submissions</a>
+    <a href="{% url 'logout' %}">Logout</a>
+  </div>
+
+  <!-- Main content -->
+  <div class="dashboard-main">
+    <h2>Student Dashboard</h2>
+    <h1>Welcome, {{ user.username }}!</h1>
+
+    <h3>Available Questions</h3>
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Question</th>
+        <th>Subject</th>
+        <th>Topic</th>
+        <th>Difficulty</th>
+        <th>Action</th>
+      </tr>
+      {% for q in questions %}
+      <tr>
+        <td>{{ q.id }}</td>
+        <td>{{ q.question_text }}</td>
+        <td>{{ q.subject }}</td>
+        <td>{{ q.topic }}</td>
+        <td>{{ q.difficulty }}</td>
+        <td><a href="{% url 'take_question' q.id %}">Answer</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No questions available yet.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Edit Question{% endblock %}
+{% block content %}
+<h2>Edit Question</h2>
+<form method="POST">
+  {% csrf_token %}
+  <textarea name="question_text" rows="5" cols="50" required>{{ question.question_text }}</textarea><br><br>
+  <input type="text" name="subject" placeholder="Subject" value="{{ question.subject }}" />
+  <input type="text" name="topic" placeholder="Topic" value="{{ question.topic }}" style="margin-left:8px;" />
+  <select name="difficulty" style="margin-left:8px;">
+    <option value="easy" {% if question.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+    <option value="medium" {% if question.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+    <option value="hard" {% if question.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+  </select>
+  <br><br>
+  <button type="submit">Update Question</button>
+  <a href="{% url 'questions_list' %}" style="margin-left:8px;">Cancel</a>
+</form>
+{% endblock %}
+

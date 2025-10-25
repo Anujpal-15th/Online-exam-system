@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Leaderboard{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboard-container">
+
+  <!-- Sidebar -->
+  <div class="dashboard-sidebar">
+    <h2>Leaderboard</h2>
+    {% if user.is_authenticated %}
+        {% if user.user_type == 3 %}
+            <a href="{% url 'questions_list' %}">Browse Questions</a>
+            <a href="{% url 'student_submissions' %}">My Submissions</a>
+            <a href="{% url 'mock_test' %}">Mock Test</a>
+        {% elif user.user_type == 2 %}
+            <a href="{% url 'questions_list' %}">Manage Questions</a>
+            <a href="{% url 'add_question' %}">Add New Question</a>
+            <a href="{% url 'submissions_list' %}">All Submissions</a>
+            <a href="{% url 'teacher_reports' %}">Performance Reports</a>
+            <a href="{% url 'mock_test' %}">Mock Test</a>
+            <a href="{% url 'export_performance_csv' %}">Export CSV</a>
+        {% elif user.user_type == 1 %}
+            <a href="{% url 'questions_list' %}">Manage Questions</a>
+            <a href="{% url 'admin_users' %}">Manage Users</a>
+            <a href="{% url 'admin_activity' %}">Reports</a>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
+    {% endif %}
+  </div>
+
+  <!-- Main Content -->
+  <div class="dashboard-main">
+    <h2>Leaderboard</h2>
+    <table border="1" cellpadding="6">
+      <tr>
+        <th>Id</th>
+        <th>Student</th>
+        <th>Total Score</th>
+        <th>Attempts</th>
+        <th>Average</th>
+      </tr>
+      {% for row in rows %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ row.student__username }}</td>
+        <td>{{ row.total_score|default:0 }}</td>
+        <td>{{ row.count }}</td>
+        <td>{{ row.avg|floatformat:2 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No graded submissions yet.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}

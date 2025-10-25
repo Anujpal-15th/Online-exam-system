@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All Submissions{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+<div class="dashboard-container">
+
+    <!-- Sidebar -->
+    <div class="dashboard-sidebar">
+        <h2>All Submissions</h2>
+        <a href="{% url 'questions_list' %}">Manage Questions</a>
+        <a href="{% url 'submissions_list' %}" class="active">All Submissions</a>
+        <a href="{% url 'teacher_reports' %}">Performance Reports</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-main">
+        <h2>All Submissions</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Graded</th>
+                <th>Score</th>
+                <th>Actions</th>
+            </tr>
+            {% for s in submissions %}
+            <tr>
+                <td>{{ s.id }}</td>
+                <td>{{ s.student.username }}</td>
+                <td>{{ s.question.id }}</td>
+                <td>{{ s.answer_text|truncatechars:80 }}</td>
+                <td>{{ s.graded }}</td>
+                <td>{% if s.score is not None %}{{ s.score }}{% else %}-{% endif %}</td>
+                <td><a href="{% url 'grade_submission' s.id %}" class="grade-link">Grade</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">No submissions yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
