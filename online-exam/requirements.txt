@@ -1,4 +1,4 @@
 Django==5.2.7
-psycopg2-binary==2.9.9
+psycopg[binary]==3.2.11
 dj-database-url==1.0.0
 
