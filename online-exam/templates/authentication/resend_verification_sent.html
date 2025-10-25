@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Verification Sent{% endblock %}
+{% block content %}
+<h2>If an account exists, we sent a verification link.</h2>
+<p>Please check your inbox.</p>
+<p><a href="{% url 'login' %}">Back to Login</a></p>
+{% endblock %}
