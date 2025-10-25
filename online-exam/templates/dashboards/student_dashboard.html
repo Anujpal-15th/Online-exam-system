@@ -1,47 +1,106 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static %} 
 {% block title %}Student Dashboard{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+.dashboard-main {
+    padding: 20px;
+    top: 0;
+}
+
+/* Welcome message */
+.dashboard-main h1 {
+    font-size: 2.5rem;       /* bigger text */
+    font-weight: 700;         /* bold */
+    color: #3b82f6;           /* nice blue color */
+    margin-bottom: 20px;  
+        
+}
+/* Available Tests title */
+.dashboard-main .available-tests-title {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 5px;
+    font-weight: 600;
+    border-bottom: 3px solid #3b82f6; /* underline color */
+    color: #3b82f6; 
+}
+
+/* Tests container */
+.dashboard-main .available-tests {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+/* Individual test card */
+.dashboard-main .test-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    width: 240px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.dashboard-main .test-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Test image */
+.dashboard-main .test-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+/* Test info */
+.dashboard-main .test-info {
+    padding: 10px 15px;
+}
+
+.dashboard-main .test-info h4 {
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.dashboard-main .test-info p {
+    margin: 3px 0;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+/* Start Test button kept as is */
+</style>
 
 <div class="dashboard-container">
 
-  <!-- Sidebar -->
-  <div class="dashboard-sidebar">
-    <h2>Student Dashboard</h2>
-    <a href="{% url 'questions_list' %}">Browse Questions</a>
-    <a href="{% url 'student_submissions' %}">My Submissions</a>
-    <a href="{% url 'logout' %}">Logout</a>
-  </div>
-
   <!-- Main content -->
   <div class="dashboard-main">
-    <h2>Student Dashboard</h2>
     <h1>Welcome, {{ user.username }}!</h1>
 
-    <h3>Available Questions</h3>
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Question</th>
-        <th>Subject</th>
-        <th>Topic</th>
-        <th>Difficulty</th>
-        <th>Action</th>
-      </tr>
-      {% for q in questions %}
-      <tr>
-        <td>{{ q.id }}</td>
-        <td>{{ q.question_text }}</td>
-        <td>{{ q.subject }}</td>
-        <td>{{ q.topic }}</td>
-        <td>{{ q.difficulty }}</td>
-        <td><a href="{% url 'take_question' q.id %}">Answer</a></td>
-      </tr>
+    <h3 class="available-tests-title">Available Tests</h3>
+    <div class="available-tests">
+      {% for test in questions %}
+      <div class="test-card">
+        <img src="{% static 'images/test_placeholder.png' %}" alt="Test Image" class="test-image">
+        <div class="test-info">
+          <h4>{{ test.subject }} - {{ test.topic }}</h4>
+          <p><strong>Number of Questions:</strong> {{ test.num_questions }}</p>
+          <p><strong>Time:</strong> {{ test.duration }} minutes</p>
+          <p><strong>Difficulty:</strong> {{ test.difficulty }}</p>
+          <a href="{% url 'take_question' test.id %}" class="btn btn-primary start-test-btn">Start Test</a>
+        </div>
+      </div>
       {% empty %}
-      <tr><td colspan="6">No questions available yet.</td></tr>
+      <p>No tests available yet.</p>
       {% endfor %}
-    </table>
+    </div>
+
   </div>
 
 </div>

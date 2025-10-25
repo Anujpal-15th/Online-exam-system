@@ -5,56 +5,93 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Register - EduExam</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 </head>
-<body>
-  <div id="login-page" class="page active">
-    <div class="login-container">
-      <div class="login-card">
-        <div class="login-header">
-          <h1><i class="fas fa-graduation-cap"></i> EduExam</h1>
-          <p>Create your account</p>
-        </div>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-100 min-h-screen flex items-center justify-center px-6">
 
-        <form method="POST" class="login-form">
-          {% csrf_token %}
-          <div class="form-group">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" name="username" id="username" class="form-control" required />
-          </div>
-
-          <div class="form-group">
-            <label for="email" class="form-label">Email (optional)</label>
-            <input type="email" name="email" id="email" class="form-control" />
-          </div>
-
-          <div class="form-group">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" name="password" id="password" class="form-control" required />
-          </div>
-
-          <div class="form-group">
-            <label for="user_type" class="form-label">Select Role</label>
-            <select name="user_type" id="user_type" class="form-control" required>
-              <option value="1">Admin</option>
-              <option value="2">Teacher</option>
-              <option value="3">Student</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn--primary btn--full-width">
-            <i class="fas fa-user-plus"></i> Create Account
-          </button>
-        </form>
-
-        <div style="text-align:center; margin-top:12px;">
-          <a href="{% url 'login' %}">Already have an account? Login</a>
-        </div>
-      </div>
+  <!-- ✅ Slightly smaller width: max-w-2xl and spaced from navbar -->
+  <div class="w-full max-w-2xl bg-white shadow-2xl rounded-3xl p-10 mt-24">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-indigo-700"><i class="fas fa-graduation-cap"></i> EduExam</h1>
+      <p class="text-gray-600 mt-2 text-lg">Create your account</p>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% csrf_token %}
+      
+      <!-- Username -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700" for="username">Username</label>
+        <input type="text" name="username" id="username"
+               class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+               required>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700" for="email">Email (optional)</label>
+        <input type="email" name="email" id="email"
+               class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700" for="password">Password</label>
+        <input type="password" name="password" id="password"
+               class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+               required>
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700" for="confirm_password">Confirm Password</label>
+        <input type="password" name="confirm_password" id="confirm_password"
+               class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+               required>
+      </div>
+
+
+      <!-- User Type -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700" for="user_type">Select Role</label>
+        <select name="user_type" id="user_type"
+                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                required>
+          <option value="">-- Select --</option>
+          <option value="1">Admin</option>
+          <option value="2">Teacher</option>
+          <option value="3">Student</option>
+        </select>
+      </div>
+
+      
+      <!-- Terms -->
+      <div class="col-span-1 md:col-span-2 flex items-center mt-2">
+        <input id="terms" name="terms" type="checkbox"
+               class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" required>
+        <label for="terms" class="ml-2 block text-sm text-gray-900">
+          I agree to the <a href="#" class="text-indigo-600 hover:underline">terms & conditions</a>
+        </label>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="col-span-1 md:col-span-2 mt-4">
+        <button type="submit"
+                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-md text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200">
+          <i class="fas fa-user-plus mr-2"></i> Create Account
+        </button>
+      </div>
+
+      <!-- Login Link -->
+      <div class="col-span-1 md:col-span-2 text-center mt-4">
+        <a href="{% url 'login' %}" class="text-sm text-indigo-600 hover:underline">Already have an account? Login</a>
+      </div>
+    </form>
+  </div>
 </body>
 </html>

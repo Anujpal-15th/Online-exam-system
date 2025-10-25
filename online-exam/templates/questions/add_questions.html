@@ -1,11 +1,86 @@
 {% extends 'base.html' %}
 {% block title %}Add Question{% endblock %}
 {% block content %}
-<h2>Add Question</h2>
-<form method="POST">
+
+<style>
+  .add-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #f9fafc;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: "Poppins", sans-serif;
+  }
+
+  .add-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .add-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    resize: vertical;
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #2563eb;
+  }
+
+  a.back-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  a.back-btn:hover {
+    background-color: #d32f2f;
+  }
+</style>
+
+<div class="add-container">
+  <h2>Add Question</h2>
+  <form method="POST">
     {% csrf_token %}
-    <textarea name="question_text" rows="5" cols="50" placeholder="Enter question" required></textarea><br><br>
-    <button type="submit">Add Question</button>
-</form>
-<a href="{% url 'questions_list' %}">Back to Questions List</a>
+    <textarea name="question_text" rows="5" placeholder="Enter your question here..." required></textarea>
+    <div class="button-row">
+      <button type="submit">Add Question</button>
+      <a href="{% url 'questions_list' %}" class="back-btn">Back</a>
+    </div>
+  </form>
+</div>
+
 {% endblock %}

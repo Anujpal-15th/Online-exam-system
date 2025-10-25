@@ -1,20 +1,103 @@
 {% extends 'base.html' %}
 {% block title %}Edit Question{% endblock %}
 {% block content %}
-<h2>Edit Question</h2>
-<form method="POST">
-  {% csrf_token %}
-  <textarea name="question_text" rows="5" cols="50" required>{{ question.question_text }}</textarea><br><br>
-  <input type="text" name="subject" placeholder="Subject" value="{{ question.subject }}" />
-  <input type="text" name="topic" placeholder="Topic" value="{{ question.topic }}" style="margin-left:8px;" />
-  <select name="difficulty" style="margin-left:8px;">
-    <option value="easy" {% if question.difficulty == 'easy' %}selected{% endif %}>Easy</option>
-    <option value="medium" {% if question.difficulty == 'medium' %}selected{% endif %}>Medium</option>
-    <option value="hard" {% if question.difficulty == 'hard' %}selected{% endif %}>Hard</option>
-  </select>
-  <br><br>
-  <button type="submit">Update Question</button>
-  <a href="{% url 'questions_list' %}" style="margin-left:8px;">Cancel</a>
-</form>
-{% endblock %}
 
+<style>
+  .edit-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #f9fafc;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .edit-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .edit-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  textarea,
+  input[type="text"],
+  select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  a.cancel-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s ease;
+  }
+
+  a.cancel-btn:hover {
+    background-color: #d32f2f;
+  }
+</style>
+
+<div class="edit-container">
+  <h2>Edit Question</h2>
+  <form method="POST">
+    {% csrf_token %}
+    <label><strong>Question:</strong></label>
+    <textarea name="question_text" rows="5" required>{{ question.question_text }}</textarea>
+
+    <div class="field-row">
+      <input type="text" name="subject" placeholder="Subject" value="{{ question.subject }}">
+      <input type="text" name="topic" placeholder="Topic" value="{{ question.topic }}">
+      <select name="difficulty">
+        <option value="easy" {% if question.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+        <option value="medium" {% if question.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+        <option value="hard" {% if question.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+      </select>
+    </div>
+
+    <div class="button-row">
+      <button type="submit">Update Question</button>
+      <a href="{% url 'questions_list' %}" class="cancel-btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

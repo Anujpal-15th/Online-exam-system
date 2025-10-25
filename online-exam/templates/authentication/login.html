@@ -5,63 +5,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EduExam - E-Assessment Platform</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  
+  <!-- Tailwind CSS for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 </head>
-<body>
-  <!-- Login Page -->
-  <div id="login-page" class="page active">
-    <div class="login-container">
-      <div class="login-card">
-        <div class="login-header">
-          <h1><i class="fas fa-graduation-cap"></i> EduExam</h1>
-          <p>E-Assessment Platform</p>
-        </div>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-100 min-h-screen flex items-center justify-center px-4">
 
-        <div class="role-selection">
-          <h3>Select Your Role</h3>
-          <div class="role-buttons">
-            <button type="button" class="role-btn" data-role="student">
-              <i class="fas fa-user-graduate"></i><span>Student</span>
-            </button>
-            <button type="button" class="role-btn" data-role="teacher">
-              <i class="fas fa-chalkboard-teacher"></i><span>Teacher</span>
-            </button>
-            <button type="button" class="role-btn" data-role="admin">
-              <i class="fas fa-user-shield"></i><span>Admin</span>
-            </button>
-          </div>
-        </div>
-
-        <form method="post" class="login-form">
-          {% csrf_token %}
-          {% if error %}
-            <p style="color:red; text-align:center;">{{ error }}</p>
-          {% endif %}
-          <input type="hidden" name="role" id="selected-role" />
-          <div class="form-group">
-            <label for="username" class="form-label">Username or Email</label>
-            <input type="text" name="username" id="username" class="form-control" required />
-          </div>
-
-          <div class="form-group">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" name="password" id="password" class="form-control" required />
-          </div>
-
-          <button type="submit" class="btn btn--primary btn--full-width">
-            <i class="fas fa-sign-in-alt"></i> Login
-          </button>
-        </form>
-
-        <div style="text-align:center; margin-top:12px;">
-          <a href="{% url 'register' %}">Don't have an account? Register</a>
-        </div>
-      </div>
+  <!-- Login container -->
+  <div class="w-full max-w-lg bg-white rounded-xl shadow-2xl p-8">
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-bold text-indigo-700"><i class="fas fa-graduation-cap"></i> EduExam</h1>
+      <p class="text-gray-600 mt-1">E-Assessment Platform</p>
     </div>
+
+    <!-- Login Form -->
+    <form method="POST" class="flex flex-col space-y-4">
+      {% csrf_token %}
+      {% if error %}
+        <p class="text-red-500 text-center">{{ error }}</p>
+      {% endif %}
+      <input type="hidden" name="role" id="selected-role" />
+
+      <!-- Username / Email -->
+      <input type="text" name="username" id="username"
+             class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition ease-in-out duration-150"
+             placeholder="Username or Email" required />
+
+      <!-- Password -->
+      <input type="password" name="password" id="password"
+             class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition ease-in-out duration-150"
+             placeholder="Password" required />
+
+      <!-- Remember & Forgot -->
+      <div class="flex items-center justify-between flex-wrap text-sm text-gray-900">
+        <label class="cursor-pointer flex items-center">
+          <input type="checkbox" id="remember-me" class="mr-2">
+          Remember me
+        </label>
+        {% comment %} <a href="{% url 'forget_password' %}" class="text-blue-500 hover:underline mb-0.5">Forgot password?</a> {% endcomment %}
+      </div>
+
+      <!-- Login Button -->
+      <button type="submit"
+              class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-3 px-4 rounded-md mt-2 hover:from-indigo-600 hover:to-blue-600 transition ease-in-out duration-150">
+        <i class="fas fa-sign-in-alt mr-2"></i> Login
+      </button>
+
+      <!-- Signup Link -->
+      <p class="text-gray-900 text-center mt-4">
+        Don't have an account? 
+        <a href="{% url 'register' %}" class="text-blue-500 hover:underline">Sign up</a>
+      </p>
+    </form>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     (function() {
       const roleButtons = document.querySelectorAll('.role-btn');

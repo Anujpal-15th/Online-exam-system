@@ -2,48 +2,79 @@
 {% load static %}
 {% block title %}Leaderboard{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
+<style>
+  .leaderboard-container {
+    width: 90%;
+    margin: 40px auto;
+    font-family: "Poppins", sans-serif;
+    background: #f9fafc;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+  }
 
-<div class="dashboard-container">
+  .leaderboard-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+  }
 
-  <!-- Sidebar -->
-  <div class="dashboard-sidebar">
-    <h2>Leaderboard</h2>
-    {% if user.is_authenticated %}
-        {% if user.user_type == 3 %}
-            <a href="{% url 'questions_list' %}">Browse Questions</a>
-            <a href="{% url 'student_submissions' %}">My Submissions</a>
-            <a href="{% url 'mock_test' %}">Mock Test</a>
-        {% elif user.user_type == 2 %}
-            <a href="{% url 'questions_list' %}">Manage Questions</a>
-            <a href="{% url 'add_question' %}">Add New Question</a>
-            <a href="{% url 'submissions_list' %}">All Submissions</a>
-            <a href="{% url 'teacher_reports' %}">Performance Reports</a>
-            <a href="{% url 'mock_test' %}">Mock Test</a>
-            <a href="{% url 'export_performance_csv' %}">Export CSV</a>
-        {% elif user.user_type == 1 %}
-            <a href="{% url 'questions_list' %}">Manage Questions</a>
-            <a href="{% url 'admin_users' %}">Manage Users</a>
-            <a href="{% url 'admin_activity' %}">Reports</a>
-        {% endif %}
-    {% else %}
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'register' %}">Register</a>
-    {% endif %}
-  </div>
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: white;
+  }
 
-  <!-- Main Content -->
-  <div class="dashboard-main">
-    <h2>Leaderboard</h2>
-    <table border="1" cellpadding="6">
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 14px 16px;
+    text-align: left;
+  }
+
+  .leaderboard-table th {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+  }
+
+  .leaderboard-table tr:nth-child(even) {
+    background-color: #f2f4f8;
+  }
+
+  .leaderboard-table tr:hover {
+    background-color: #e0ecff;
+    transition: 0.3s ease;
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 16px;
+  }
+
+  
+</style>
+
+<div class="leaderboard-container">
+  <h2>🏆 Leaderboard</h2>
+
+  
+
+  <table class="leaderboard-table">
+    <thead>
       <tr>
-        <th>Id</th>
+        <th>#</th>
         <th>Student</th>
         <th>Total Score</th>
         <th>Attempts</th>
         <th>Average</th>
       </tr>
+    </thead>
+    <tbody>
       {% for row in rows %}
       <tr>
         <td>{{ forloop.counter }}</td>
@@ -53,11 +84,12 @@
         <td>{{ row.avg|floatformat:2 }}</td>
       </tr>
       {% empty %}
-      <tr><td colspan="5">No graded submissions yet.</td></tr>
+      <tr>
+        <td colspan="5" class="no-data">No graded submissions yet.</td>
+      </tr>
       {% endfor %}
-    </table>
-  </div>
-
+    </tbody>
+  </table>
 </div>
 
 {% endblock %}

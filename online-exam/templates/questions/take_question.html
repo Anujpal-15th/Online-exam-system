@@ -1,13 +1,135 @@
 {% extends 'base.html' %}
 {% block title %}Answer Question{% endblock %}
 {% block content %}
-<h2>Answer</h2>
-<p><strong>Question:</strong> {{ question.question_text }}</p>
-<form method="POST">
-  {% csrf_token %}
-  <textarea name="answer_text" rows="5" cols="60" placeholder="Type your answer here" required></textarea><br><br>
-  <button type="submit">Submit Answer</button>
-  <a href="{% url 'questions_list' %}" style="margin-left:8px;">Back</a>
-</form>
-{% endblock %}
 
+<style>
+  .answer-container {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #f9fafc;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: "Poppins", sans-serif;
+    position: relative;
+  }
+
+  .answer-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+
+  .question-text {
+    background-color: #eef2ff;
+    border-left: 4px solid #3b82f6;
+    padding: 12px;
+    border-radius: 6px;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    resize: vertical;
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #2563eb;
+  }
+
+  a.back-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  a.back-btn:hover {
+    background-color: #d32f2f;
+  }
+
+  /* Timer Styles */
+  .timer {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+</style>
+
+<div class="answer-container">
+  <div class="timer" id="timer">30:00</div>
+
+  <h2>Answer Question</h2>
+  <div class="question-text">
+    <strong>Question:</strong> {{ question.question_text }}
+  </div>
+
+  <form method="POST" id="answerForm">
+    {% csrf_token %}
+    <textarea name="answer_text" rows="5" placeholder="Type your answer here..." required></textarea>
+
+    <div class="button-row">
+      <button type="submit">Submit Answer</button>
+      <a href="{% url 'questions_list' %}" class="back-btn">Back</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Timer: 30 minutes (in seconds)
+  let timeLeft = 30 * 60;
+
+  const timerDisplay = document.getElementById("timer");
+  const form = document.getElementById("answerForm");
+
+  const countdown = setInterval(() => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerDisplay.textContent = 
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    if (timeLeft <= 0) {
+      clearInterval(countdown);
+      alert("⏰ Time's up! Your test time has ended.");
+      form.submit(); // You can remove this line if you don’t want auto-submit
+    }
+
+    timeLeft--;
+  }, 1000);
+</script>
+
+{% endblock %}
