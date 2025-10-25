@@ -14,11 +14,56 @@
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-white to-purple-100 min-h-screen flex items-center justify-center px-6">
 
+<<<<<<< HEAD
   <!-- ✅ Slightly smaller width: max-w-2xl and spaced from navbar -->
   <div class="w-full max-w-2xl bg-white shadow-2xl rounded-3xl p-10 mt-24">
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold text-indigo-700"><i class="fas fa-graduation-cap"></i> EduExam</h1>
       <p class="text-gray-600 mt-2 text-lg">Create your account</p>
+=======
+        <form method="POST" class="login-form">
+          {% csrf_token %}
+          {% if error %}
+            <div style="color:red; text-align:center; margin-bottom:15px; padding:10px; background:#ffe6e6; border:1px solid #ff9999; border-radius:4px;">
+              {{ error }}
+            </div>
+          {% endif %}
+          
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" name="username" id="username" class="form-control" value="{{ request.POST.username|default:'' }}" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" value="{{ request.POST.email|default:'' }}" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" name="password" id="password" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="user_type" class="form-label">Select Role</label>
+            <select name="user_type" id="user_type" class="form-control" required>
+              <option value="">-- Select Role --</option>
+              <!-- <option value="1" {% if request.POST.user_type == '1' %}selected{% endif %}>Admin</option> -->
+              <option value="2" {% if request.POST.user_type == '2' %}selected{% endif %}>Teacher</option>
+              <option value="3" {% if request.POST.user_type == '3' %}selected{% endif %}>Student</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full-width">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+        </form>
+
+        <div style="text-align:center; margin-top:12px;">
+          <a href="{% url 'login' %}">Already have an account? Login</a>
+        </div>
+      </div>
+>>>>>>> 6530a42c0ccd7eb3cc0d70a6dde8df36f63efb86
     </div>
 
     <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">

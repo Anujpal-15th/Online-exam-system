@@ -14,11 +14,61 @@
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-white to-purple-100 min-h-screen flex items-center justify-center px-4">
 
+<<<<<<< HEAD
   <!-- Login container -->
   <div class="w-full max-w-lg bg-white rounded-xl shadow-2xl p-8">
     <div class="text-center mb-6">
       <h1 class="text-3xl font-bold text-indigo-700"><i class="fas fa-graduation-cap"></i> EduExam</h1>
       <p class="text-gray-600 mt-1">E-Assessment Platform</p>
+=======
+        <!-- <div class="role-selection">
+          <h3>Select Your Role</h3>
+          <div class="role-buttons">
+            <button type="button" class="role-btn" data-role="student">
+              <i class="fas fa-user-graduate"></i><span>Student</span>
+            </button>
+            <button type="button" class="role-btn" data-role="teacher">
+              <i class="fas fa-chalkboard-teacher"></i><span>Teacher</span>
+            </button>
+            <button type="button" class="role-btn" data-role="admin">
+              <i class="fas fa-user-shield"></i><span>Admin</span>
+            </button>
+          </div>
+        </div> -->
+
+        <form method="post" class="login-form">
+          {% csrf_token %}
+          {% if error %}
+            <p style="color:red; text-align:center;">{{ error }}</p>
+          {% endif %}
+          {% if show_resend %}
+            <div style="text-align:center; margin:8px 0;">
+              <a class="btn btn--primary" href="{% url 'resend_verification' %}">Resend verification email</a>
+            </div>
+          {% endif %}
+          <input type="hidden" name="role" id="selected-role" />
+          <div class="form-group">
+            <label for="username" class="form-label">Username or Email</label>
+            <input type="text" name="username" id="username" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" name="password" id="password" class="form-control" required />
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full-width">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </form>
+
+        <div style="text-align:center; margin-top:12px;">
+          <a href="{% url 'password_reset' %}">Forgot password?</a>
+          <br />
+          <a href="{% url 'register' %}">Don't have an account? Register</a>
+        </div>
+      </div>
+>>>>>>> 6530a42c0ccd7eb3cc0d70a6dde8df36f63efb86
     </div>
 
     <!-- Login Form -->
