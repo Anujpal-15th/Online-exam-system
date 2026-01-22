@@ -1,0 +1,183 @@
+/**
+ * ============================================================================
+ * BADGE COMPONENTS
+ * ============================================================================
+ * 
+ * Small status indicators and labels.
+ * 
+ * Badge Types:
+ * - .badge              : Base badge
+ * - .badge-primary      : Primary color
+ * - .badge-success      : Success/approved
+ * - .badge-warning      : Warning/pending
+ * - .badge-error        : Error/failed
+ * - .badge-info         : Informational
+ * - .badge-difficulty   : For question difficulty levels
+ * ============================================================================
+ */
+
+/* ============================================================================
+   BASE BADGE
+   ============================================================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    line-height: 1;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+}
+
+/* ============================================================================
+   BADGE COLORS - HIGH CONTRAST PROFESSIONAL DESIGN
+   ============================================================================ */
+
+.badge-primary,
+.bg-primary {
+    background-color: #007bff !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-success,
+.bg-success {
+    background-color: #28a745 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-warning,
+.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-error,
+.badge-danger,
+.bg-danger {
+    background-color: #dc3545 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-info,
+.bg-info {
+    background-color: #17a2b8 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-secondary,
+.bg-secondary {
+    background-color: #6c757d !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+/* ============================================================================
+   DIFFICULTY BADGES (for questions)
+   ============================================================================ */
+
+.badge-difficulty-easy {
+    background-color: #28a745 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-difficulty-medium {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-difficulty-hard {
+    background-color: #dc3545 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+/* ============================================================================
+   QUESTION TYPE BADGES
+   ============================================================================ */
+
+.badge-type-mcq {
+    background-color: #6f42c1 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-type-tf {
+    background-color: #17a2b8 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-type-short {
+    background-color: #fd7e14 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-type-essay {
+    background-color: #e83e8c !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-type-question {
+    background-color: #6f42c1 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.badge-type-test {
+    background-color: #17a2b8 !important;
+    color: white !important;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+/* ============================================================================
+   BADGE SIZES
+   ============================================================================ */
+
+.badge-sm {
+    padding: 2px var(--spacing-2);
+    font-size: 10px;
+}
+
+.badge-lg {
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   BADGE WITH DOT
+   ============================================================================ */
+
+.badge-dot::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: currentColor;
+}

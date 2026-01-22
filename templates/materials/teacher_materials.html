@@ -1,0 +1,680 @@
+{% extends 'dashboards/teacher_base.html' %}
+{% load static %}
+
+{% block title %}My Materials{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/materials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-book"></i> My Materials</h1>
+</div>
+
+<div class="dashboard-content-wrapper">
+    <!-- Folder Sidebar -->
+    <div class="folder-sidebar">
+        <div class="custom-card folder-panel">
+            <div class="card-header-section">
+                <h3 class="card-section-title"><i class="fas fa-folder-tree"></i> Folders</h3>
+                <button class="btn btn-sm btn-primary" onclick="showCreateMaterialFolderModal()" title="Create New Folder">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <!-- All Materials Link -->
+            <div class="folder-item folder-link {% if request.GET.folder == 'all' %}active{% endif %}">
+                <a href="{% url 'teacher_materials' %}?folder=all" class="folder-link-a">
+                    <i class="fas fa-list" style="color: #667eea;"></i>
+                    <span class="folder-name">All Materials</span>
+                </a>
+            </div>
+            
+            <!-- Unassigned Materials Link -->
+            <div class="folder-item folder-link {% if not current_folder and not request.GET.folder %}active{% endif %}">
+                <a href="{% url 'teacher_materials' %}" class="folder-link-a">
+                    <i class="fas fa-inbox" style="color: #6c757d;"></i>
+                    <span class="folder-name">Unassigned</span>
+                </a>
+            </div>
+            
+            <!-- Folder Tree -->
+            <div id="material-folder-tree" style="margin-top: 10px;">
+                {% include 'materials/partials/material_folder_tree.html' with folders=folders current_folder=current_folder %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div>
+        <!-- Breadcrumb -->
+        {% if current_folder %}
+        <div class="custom-card breadcrumb-card">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="margin: 0; background: none; padding: 0;">
+                    <li class="breadcrumb-item"><a href="{% url 'teacher_materials' %}?folder=all"><i class="fas fa-home"></i> All Materials</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ current_folder.get_full_path }}</li>
+                </ol>
+            </nav>
+        </div>
+        {% elif request.GET.folder == 'all' %}
+        <div class="custom-card breadcrumb-card">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="margin: 0; background: none; padding: 0;">
+                    <li class="breadcrumb-item active" aria-current="page"><i class="fas fa-list"></i> All Materials</li>
+                </ol>
+            </nav>
+        </div>
+        {% endif %}
+
+        <!-- Search/Filter Card -->
+        <div class="custom-card">
+            <h3 class="card-section-title"><i class="fas fa-search"></i> Search & Filter</h3>
+            <form method="get" class="row g-3">
+                {% if current_folder %}<input type="hidden" name="folder" value="{{ current_folder.id }}">{% endif %}
+                {% if request.GET.folder == 'all' %}<input type="hidden" name="folder" value="all">{% endif %}
+                <div class="col-md-4">
+                    <label class="form-label"><i class="fas fa-text-width"></i> Search Text</label>
+                    <input type="text" name="q" class="form-control" placeholder="Search title or description" value="{{ request.GET.q }}" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-book-open"></i> Subject</label>
+                    <select name="subject" id="filter-subject-selector" class="form-control" data-selected="{{ request.GET.subject }}">
+                        <option value="">-- Loading subjects... --</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                </div>
+                <div class="col-md-2 d-flex align-items-end justify-content-end">
+                    <button type="button" class="btn btn-success" onclick="showUploadModal()">
+                        <i class="fas fa-upload"></i> Upload Material
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bulk Actions Bar -->
+        <div id="bulk-actions-bar" class="bulk-actions-bar" style="display: none;">
+            <div class="d-flex align-items-center gap-3">
+                <span id="selected-count" class="badge badge-primary">0 selected</span>
+                <button class="btn btn-sm btn-primary" onclick="showMoveToMaterialFolderModal()">
+                    <i class="fas fa-folder"></i> Move to Folder
+                </button>
+                <button class="btn btn-sm btn-secondary" onclick="clearSelection()">
+                    <i class="fas fa-times"></i> Clear Selection
+                </button>
+            </div>
+        </div>
+
+        <!-- Materials List -->
+        <div class="custom-card">
+            <h3 class="card-section-title"><i class="fas fa-folder-open"></i> Materials</h3>
+            <div class="data-table">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">
+                                <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)">
+                            </th>
+                            <th><i class="fas fa-heading"></i> Title</th>
+                            <th style="width: 150px;"><i class="fas fa-book-open"></i> Subject</th>
+                            <th style="width: 150px;"><i class="fas fa-tag"></i> Topic</th>
+                            <th style="width: 120px;"><i class="fas fa-eye"></i> Visibility</th>
+                            <th class="text-center" style="width: 120px;"><i class="fas fa-cog"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in materials %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="material-checkbox" value="{{ m.id }}" onchange="updateBulkActions()">
+                            </td>
+                            <td>
+                                <strong>{{ m.title }}</strong>
+                                {% if m.description %}
+                                <br><small class="text-muted">{{ m.description|truncatewords:10 }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if m.subject %}
+                                <span class="badge badge-subject">{{ m.subject }}</span>
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="text-muted">{{ m.topic|default:"—" }}</span></td>
+                            <td>
+                                {% if m.is_public %}
+                                    <span class="badge badge-success"><i class="fas fa-check"></i> Public</span>
+                                {% else %}
+                                    <span class="badge badge-secondary"><i class="fas fa-lock"></i> Hidden</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="action-buttons">
+                                    <a href="{{ m.file.url }}" target="_blank" class="btn btn-sm btn-action-view" title="Download">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                    <form method="post" action="{% url 'delete_material' m.id %}" 
+                                          onsubmit="return confirm('Delete this material?');" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-action-delete" title="Delete Material">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <i class="fas fa-{% if current_folder %}folder-open{% else %}inbox{% endif %}"></i>
+                                <p>
+                                    {% if current_folder %}
+                                        No materials in this folder yet.
+                                    {% else %}
+                                        No unassigned materials. Upload materials or check folders.
+                                    {% endif %}
+                                </p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Material Modal -->
+<div class="modal fade" id="uploadMaterialModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-upload"></i> Upload New Material</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'upload_material' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label"><i class="fas fa-heading"></i> Title</label>
+                            <input type="text" name="title" class="form-control" placeholder="e.g., Chapter 3 Notes" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label"><i class="fas fa-book-open"></i> Subject</label>
+                            <select name="subject" id="upload-subject-selector" class="form-control">
+                                <option value="">-- Loading subjects... --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fas fa-tag"></i> Topic</label>
+                            <input type="text" name="topic" class="form-control" placeholder="e.g., Kinematics">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fas fa-file"></i> File</label>
+                            <input type="file" name="file" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label"><i class="fas fa-align-left"></i> Description (optional)</label>
+                            <textarea name="description" rows="3" class="form-control" placeholder="Short description..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_public" name="is_public" checked>
+                                <label class="form-check-label" for="is_public">
+                                    <i class="fas fa-eye"></i> Visible to students
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Material</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Material Folder Modal -->
+<div class="modal fade" id="createMaterialFolderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-folder-plus"></i> Create New Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-signature"></i> Folder Name</label>
+                    <input type="text" id="new-material-folder-name" class="form-control" placeholder="e.g., Physics Materials" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-align-left"></i> Description (optional)</label>
+                    <textarea id="new-material-folder-description" class="form-control" rows="2" placeholder="Optional description..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createMaterialFolder()">
+                    <i class="fas fa-check"></i> Create Folder
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Move to Material Folder Modal -->
+<div class="modal fade" id="moveToMaterialFolderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-folder"></i> Move Materials to Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="mb-3">Select a folder or create a new one:</h6>
+                <div id="material-folders-list" class="mb-3"></div>
+                <hr>
+                <h6 class="mb-3">Or create a new folder:</h6>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" id="quick-material-folder-name" class="form-control" placeholder="New folder name">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-success w-100" onclick="createAndMoveToNewMaterialFolder()">
+                            <i class="fas fa-plus"></i> Create & Move
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% load static %}
+<script src="{% static 'js/subject-selector.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    new SubjectSelector('filter-subject-selector');
+    new SubjectSelector('upload-subject-selector');
+});
+
+// Bulk selection
+function toggleSelectAll(checkbox) {
+    const checkboxes = document.querySelectorAll('.material-checkbox');
+    checkboxes.forEach(cb => cb.checked = checkbox.checked);
+    updateBulkActions();
+}
+
+function updateBulkActions() {
+    const checkboxes = document.querySelectorAll('.material-checkbox:checked');
+    const count = checkboxes.length;
+    const bulkBar = document.getElementById('bulk-actions-bar');
+    const countBadge = document.getElementById('selected-count');
+    
+    if (count > 0) {
+        bulkBar.style.display = 'block';
+        countBadge.textContent = count + ' selected';
+    } else {
+        bulkBar.style.display = 'none';
+    }
+}
+
+function clearSelection() {
+    document.querySelectorAll('.material-checkbox').forEach(cb => cb.checked = false);
+    document.getElementById('select-all').checked = false;
+    updateBulkActions();
+}
+
+// Upload modal
+function showUploadModal() {
+    const modal = new bootstrap.Modal(document.getElementById('uploadMaterialModal'));
+    modal.show();
+}
+
+// Create folder modal
+function showCreateMaterialFolderModal() {
+    const modal = new bootstrap.Modal(document.getElementById('createMaterialFolderModal'));
+    modal.show();
+}
+
+function createMaterialFolder() {
+    const name = document.getElementById('new-material-folder-name').value.trim();
+    const description = document.getElementById('new-material-folder-description').value.trim();
+    
+    if (!name) {
+        alert('Please enter a folder name');
+        return;
+    }
+    
+    fetch('{% url "create_material_folder" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ name, description })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+
+// Move to folder
+function showMoveToMaterialFolderModal() {
+    const checkboxes = document.querySelectorAll('.material-checkbox:checked');
+    if (checkboxes.length === 0) {
+        alert('Please select at least one material');
+        return;
+    }
+    
+    loadMaterialFoldersIntoModal();
+    const modal = new bootstrap.Modal(document.getElementById('moveToMaterialFolderModal'));
+    modal.show();
+}
+
+function loadMaterialFoldersIntoModal() {
+    fetch('{% url "get_material_folders_json" %}')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('material-folders-list');
+            if (data.folders && data.folders.length > 0) {
+                container.innerHTML = data.folders.map(folder => `
+                    <div class="folder-card" onclick="selectMaterialFolderAndMove(${folder.id})">
+                        <i class="${folder.icon}" style="color: ${folder.color};"></i>
+                        <span>${folder.name}</span>
+                        <small class="text-muted">(${folder.material_count} materials)</small>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="text-muted">No folders yet. Create one below.</p>';
+            }
+        });
+}
+
+function selectMaterialFolderAndMove(folderId) {
+    const materialIds = Array.from(document.querySelectorAll('.material-checkbox:checked')).map(cb => cb.value);
+    
+    fetch('{% url "move_materials_to_folder" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ material_ids: materialIds, folder_id: folderId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+
+function createAndMoveToNewMaterialFolder() {
+    const name = document.getElementById('quick-material-folder-name').value.trim();
+    if (!name) {
+        alert('Please enter a folder name');
+        return;
+    }
+    
+    const materialIds = Array.from(document.querySelectorAll('.material-checkbox:checked')).map(cb => cb.value);
+    
+    fetch('{% url "create_material_folder" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ name, description: '' })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            return fetch('{% url "move_materials_to_folder" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ material_ids: materialIds, folder_id: data.folder.id })
+            });
+        } else {
+            throw new Error(data.error);
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => alert('Error: ' + error.message));
+}
+
+// Edit and delete material folder functions
+function editMaterialFolder(id, name, description, color, icon) {
+    // TODO: Implement edit modal similar to question folders
+    alert('Edit folder: ' + name);
+}
+
+function deleteMaterialFolder(id, name) {
+    if (confirm('Are you sure you want to delete the folder "' + name + '"? Materials in this folder will become unassigned.')) {
+        fetch(`/questions/materials/folders/${id}/delete/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        });
+    }
+}
+
+// Show folder actions on hover
+document.addEventListener('DOMContentLoaded', function() {
+    // Set folder icon colors from data attributes
+    document.querySelectorAll('.folder-icon[data-color]').forEach(icon => {
+        if (!icon.classList.contains('active-icon')) {
+            icon.style.color = icon.getAttribute('data-color');
+        }
+    });
+    
+    // Folder hover actions
+    document.querySelectorAll('.folder-item').forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            const actions = this.querySelector('.folder-actions');
+            if (actions) actions.style.opacity = '1';
+        });
+        item.addEventListener('mouseleave', function() {
+            const actions = this.querySelector('.folder-actions');
+            if (actions) actions.style.opacity = '0';
+        });
+    });
+    
+    // Folder action button handlers
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-folder-action');
+        if (!btn) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const action = btn.dataset.action;
+        const folderId = btn.dataset.folderId;
+        const folderName = btn.dataset.folderName;
+        
+        if (action === 'edit') {
+            editMaterialFolder(
+                folderId, 
+                folderName, 
+                btn.dataset.folderDescription, 
+                btn.dataset.folderColor, 
+                btn.dataset.folderIcon
+            );
+        } else if (action === 'delete') {
+            deleteMaterialFolder(folderId, folderName);
+        }
+    });
+});
+</script>
+
+<style>
+.folder-card {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.folder-card:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+    transform: translateX(5px);
+}
+
+.folder-card i {
+    font-size: 20px;
+}
+
+.folder-link {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+
+.folder-link.active {
+    background: #f0f4ff;
+}
+
+.folder-link-a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.folder-name {
+    font-weight: 500;
+}
+
+.folder-tree-item {
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 3px;
+    position: relative;
+}
+
+.folder-tree-item.active.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.folder-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.folder-link-tree {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    color: #333;
+    font-weight: 500;
+}
+
+.folder-link-tree.active-link {
+    color: white;
+}
+
+.folder-icon {
+    transition: color 0.2s;
+}
+
+.folder-icon.active-icon {
+    color: white !important;
+}
+
+.folder-text {
+    flex: 1;
+}
+
+.folder-badge {
+    background: #f0f0f0;
+    color: #667eea;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.folder-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.btn-folder-action {
+    background: none;
+    border: none;
+    padding: 2px 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-edit-folder {
+    color: #667eea;
+}
+
+.btn-delete-folder {
+    color: #dc3545;
+}
+
+.btn-folder-action.active-btn {
+    color: white;
+}
+
+.btn-folder-action:hover {
+    transform: scale(1.2);
+}
+
+.folder-children {
+    margin-left: 20px;
+    margin-top: 5px;
+}
+</style>
+{% endblock %}

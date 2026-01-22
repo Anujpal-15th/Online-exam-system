@@ -1,0 +1,95 @@
+{% extends 'dashboards/admin_base.html' %}
+{% block title %}Activity & Reports{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-chart-line"></i> Activity & Reports</h1>
+</div>
+
+<!-- Summary Stats -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-bottom: 30px;">
+    <div class="stat-card">
+        <div>
+            <div class="stat-value">{{ questions_count }}</div>
+            <div class="stat-title">Total Questions</div>
+        </div>
+        <i class="fas fa-question-circle" style="color: #667eea;"></i>
+    </div>
+    <div class="stat-card">
+        <div>
+            <div class="stat-value">{{ submissions_count }}</div>
+            <div class="stat-title">Total Submissions</div>
+        </div>
+        <i class="fas fa-clipboard-check" style="color: #1cc88a;"></i>
+    </div>
+</div>
+
+<!-- Questions by Teacher -->
+<div class="custom-card">
+    <h3 style="color: #667eea; margin-bottom: 20px;">
+        <i class="fas fa-chalkboard-teacher"></i> Questions Created by Teachers
+    </h3>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-user"></i> Teacher</th>
+                    <th class="text-center"><i class="fas fa-list-ol"></i> Questions Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in created_by_teacher %}
+                <tr>
+                    <td><strong>{{ row.author__username|default:'(unknown)' }}</strong></td>
+                    <td class="text-center"><span class="badge badge-primary" style="color: white;">{{ row.cnt }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center" style="padding: 40px; color: #999;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <p>No data available</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Submissions by Student -->
+<div class="custom-card">
+    <h3 style="color: #667eea; margin-bottom: 20px;">
+        <i class="fas fa-user-graduate"></i> Student Submissions Performance
+    </h3>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-user"></i> Student</th>
+                    <th class="text-center"><i class="fas fa-clipboard-list"></i> Attempts</th>
+                    <th class="text-center"><i class="fas fa-star"></i> Total Score</th>
+                    <th class="text-center"><i class="fas fa-chart-bar"></i> Average Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in submissions_by_student %}
+                <tr>
+                    <td><strong>{{ row.student__username }}</strong></td>
+                    <td class="text-center"><span class="badge badge-info">{{ row.cnt }}</span></td>
+                    <td class="text-center"><span class="badge badge-success">{{ row.total|default:0 }}</span></td>
+                    <td class="text-center"><span class="badge badge-warning">{{ row.avg|floatformat:2 }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center" style="padding: 40px; color: #999;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <p>No submissions yet</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

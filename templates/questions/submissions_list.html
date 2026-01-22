@@ -1,49 +1,160 @@
-{% extends 'base.html' %}
+{% extends 'dashboards/teacher_base.html' %}
 {% load static %}
-{% block title %}All Submissions{% endblock %}
+{% block title %}Submissions{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
-
-<div class="dashboard-container">
-
-    <!-- Sidebar -->
-    <div class="dashboard-sidebar">
-        <h2>All Submissions</h2>
-        <a href="{% url 'questions_list' %}">Manage Questions</a>
-        <a href="{% url 'submissions_list' %}" class="active">All Submissions</a>
-        <a href="{% url 'teacher_reports' %}">Performance Reports</a>
-    </div>
-
-    <!-- Main Content -->
-    <div class="dashboard-main">
-        <h2>All Submissions</h2>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Student</th>
-                <th>Question</th>
-                <th>Answer</th>
-                <th>Graded</th>
-                <th>Score</th>
-                <th>Actions</th>
-            </tr>
-            {% for s in submissions %}
-            <tr>
-                <td>{{ s.id }}</td>
-                <td>{{ s.student.username }}</td>
-                <td>{{ s.question.id }}</td>
-                <td>{{ s.answer_text|truncatechars:80 }}</td>
-                <td>{{ s.graded }}</td>
-                <td>{% if s.score is not None %}{{ s.score }}{% else %}-{% endif %}</td>
-                <td><a href="{% url 'grade_submission' s.id %}" class="grade-link">Grade</a></td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="7">No submissions yet.</td></tr>
-            {% endfor %}
-        </table>
-    </div>
-
+<div class="page-header">
+    <h1><i class="fas fa-clipboard-check"></i> All Submissions</h1>
 </div>
 
+{% if submissions %}
+<div class="stats-grid" style="margin-bottom: 30px;">
+    <div class="stat-card">
+        <i class="fas fa-clipboard-list stat-icon"></i>
+        <div class="stat-content">
+            <div class="stat-value">{{ submissions|length }}</div>
+            <div class="stat-label">Total Submissions</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-file-alt stat-icon"></i>
+        <div class="stat-content">
+            <div class="stat-value">{{ legacy_count }}</div>
+            <div class="stat-label">Question Submissions</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-clipboard-check stat-icon"></i>
+        <div class="stat-content">
+            <div class="stat-value">{{ test_attempt_count }}</div>
+            <div class="stat-label">Test Submissions</div>
+        </div>
+    </div>
+</div>
+
+<div class="custom-card">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Type</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Student</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Test/Question</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd;">Questions</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd;">Status</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd;">Score</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd;">Submitted</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in submissions %}
+                <tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 15px;">
+                        {% if s.type == 'test_attempt' %}
+                        <span style="background: #e3f2fd; color: #1565c0; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                            <i class="fas fa-clipboard-list"></i> Test
+                        </span>
+                        {% else %}
+                        <span style="background: #f3e5f5; color: #6a1b9a; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                            <i class="fas fa-question-circle"></i> Question
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-user-circle" style="color: #667eea; font-size: 1.5rem;"></i>
+                            <span style="font-weight: 600; color: #333;">{{ s.student.username }}</span>
+                        </div>
+                    </td>
+                    <td style="padding: 15px;">
+                        {% if s.type == 'test_attempt' %}
+                        <div style="font-weight: 600; color: #333;">{{ s.test_name }}</div>
+                        <div style="color: #999; font-size: 0.85rem;">Attempt #{{ s.attempt_number }}</div>
+                        {% else %}
+                        <span style="background: #f0f0f0; padding: 4px 12px; border-radius: 6px; font-weight: 600; color: #667eea;">
+                            <i class="fas fa-question-circle"></i> Q{{ s.question.id }}
+                        </span>
+                        <div style="color: #666; font-size: 0.85rem; margin-top: 4px;">
+                            {{ s.question.question_text|truncatechars:50 }}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        {% if s.type == 'test_attempt' %}
+                        <div style="font-weight: 600; color: #333;">{{ s.total_questions }}</div>
+                        <div style="color: #999; font-size: 0.85rem;">{{ s.graded_count }} graded</div>
+                        {% else %}
+                        <span style="color: #999;">1</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        {% if s.graded %}
+                        <span class="badge badge-success">
+                            <i class="fas fa-check-circle"></i> Graded
+                        </span>
+                        {% else %}
+                        <div style="display: inline-flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <span class="badge badge-warning">
+                                <i class="fas fa-exclamation-circle"></i> Pending
+                            </span>
+                            {% if s.type == 'test_attempt' and s.ungraded_subjective %}
+                            <small class="text-muted">({{ s.ungraded_subjective }} to grade)</small>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        {% if s.type == 'test_attempt' %}
+                            {% if s.total_score is not None %}
+                            <span style="font-size: 1.2rem; font-weight: 700; color: #667eea;">
+                                {{ s.total_score }}
+                            </span>
+                            {% else %}
+                            <span style="color: #999;">-</span>
+                            {% endif %}
+                        {% else %}
+                            {% if s.score is not None %}
+                            <span style="font-size: 1.2rem; font-weight: 700; color: #667eea;">
+                                {{ s.score }}
+                            </span>
+                            {% else %}
+                            <span style="color: #999;">-</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px; text-align: center; color: #666; font-size: 0.9rem;">
+                        {{ s.submitted_at|date:"M d, Y" }}<br>
+                        <span style="color: #999; font-size: 0.85rem;">{{ s.submitted_at|time:"g:i A" }}</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        {% if s.type == 'test_attempt' %}
+                        <a href="{% url 'grade_test_attempt' s.id %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-pen"></i> Grade Test
+                        </a>
+                        {% else %}
+                        <a href="{% url 'grade_submission' s.id %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-pen"></i> Grade
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-inbox fa-4x"></i>
+    <p>No submissions yet.</p>
+    <p style="color: #999; font-size: 0.9rem; margin-top: 10px;">
+        Students haven't submitted any answers yet. Check back later!
+    </p>
+</div>
+{% endif %}
+
+<a href="{% url 'teacher_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
 {% endblock %}

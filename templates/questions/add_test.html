@@ -1,0 +1,121 @@
+{% extends base_template|default:'dashboards/teacher_base.html' %}
+{% load static %}
+{% block title %}Create Test - Step 1{% endblock %}
+{% block content %}
+
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <h1><i class="fas fa-plus-square"></i> Create New Test</h1>
+    <span class="badge bg-primary" style="font-size: 14px;">Step 1 of 2</span>
+</div>
+
+<div class="alert alert-info" style="margin-bottom: 20px;">
+    <strong><i class="fas fa-route"></i> Workflow:</strong> 
+    <span style="color: #0c5460;">Step 1:</span> Select questions → 
+    <span style="color: #856404;">Step 2:</span> Arrange order & set schedule
+</div>
+
+{% if error %}
+<div class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+</div>
+{% endif %}
+
+<div class="custom-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-heading"></i> Title <span class="required">*</span>
+            </label>
+            <input type="text" name="title" required class="form-input" placeholder="Enter test title">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-book"></i> Subject
+            </label>
+            <select name="subject" id="test-subject-selector" class="form-select">
+                <option value="">-- Loading subjects... --</option>
+            </select>
+            <small class="form-hint">
+                <i class="fas fa-info-circle"></i> Select a subject or add a new one from the dropdown
+            </small>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-question-circle"></i> Select Questions <span class="required">*</span>
+            </label>
+            <small class="form-hint" style="display: block; margin-bottom: 10px;">
+                <i class="fas fa-info-circle"></i> After creating the test, you can arrange question order and set schedule.
+            </small>
+            <div class="question-selection-container">
+                {% if questions %}
+                    {% for q in questions %}
+                    <div class="question-checkbox-item">
+                        <label class="question-checkbox-label">
+                            <input type="checkbox" name="question_ids" id="q{{ q.id }}" value="{{ q.id }}">
+                            <div class="question-checkbox-content">
+                                <div class="question-badges">
+                                    <span class="question-subject-badge">
+                                        {{ q.subject|default:'General' }}
+                                    </span>
+                                    <span class="difficulty-badge difficulty-{{ q.difficulty }}">
+                                        {{ q.difficulty|upper }}
+                                    </span>
+                                </div>
+                                <div class="question-text-preview">
+                                    {{ q.question_text|truncatechars:150 }}
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox fa-4x"></i>
+                    <p>No questions available yet.</p>
+                    <a href="{% url 'add_question' %}" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;">
+                        Add Your First Question
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> Create & Arrange Questions
+            </button>
+            {% if user.user_type == 1 %}
+            <a href="{% url 'admin_tests' %}" class="btn-cancel">
+                <i class="fas fa-times-circle"></i> Cancel
+            </a>
+            {% else %}
+            <a href="{% url 'tests_list' %}" class="btn-cancel">
+                <i class="fas fa-times-circle"></i> Cancel
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% if user.user_type == 1 %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+{% else %}
+<a href="{% url 'teacher_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+{% endif %}
+
+<script src="{% static 'js/subject-selector.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize subject selector - fetches subjects from database
+    new SubjectSelector('test-subject-selector');
+});
+</script>
+{% endblock %}

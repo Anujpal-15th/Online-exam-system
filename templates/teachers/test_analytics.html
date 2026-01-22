@@ -1,0 +1,137 @@
+{% extends 'dashboards/teacher_base.html' %}
+{% load static %}
+{% block title %}Test Analytics - {{ test.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-chart-bar"></i> Test Analytics: {{ test.title }}</h1>
+</div>
+
+<!-- Summary Statistics -->
+<div class="analytics-stats-grid">
+    <div class="analytics-stat-card purple">
+        <div class="analytics-stat-label">Total Attempts</div>
+        <div class="analytics-stat-value">{{ stats.total_attempts|default:0 }}</div>
+    </div>
+    
+    <div class="analytics-stat-card pink">
+        <div class="analytics-stat-label">Unique Students</div>
+        <div class="analytics-stat-value">{{ stats.total_students|default:0 }}</div>
+    </div>
+    
+    <div class="analytics-stat-card blue">
+        <div class="analytics-stat-label">Average Score</div>
+        <div class="analytics-stat-value">{{ stats.avg_score|floatformat:1|default:"N/A" }}</div>
+    </div>
+    
+    <div class="analytics-stat-card green">
+        <div class="analytics-stat-label">Highest Score</div>
+        <div class="analytics-stat-value">{{ stats.max_score|default:"N/A" }}</div>
+    </div>
+</div>
+
+<!-- Test Information -->
+<div class="custom-card analytics-card">
+    <h3><i class="fas fa-info-circle"></i> Test Information</h3>
+    <div class="analytics-info-grid">
+        <div><strong>Subject:</strong> {{ test.subject|default:"N/A" }}</div>
+        <div><strong>Duration:</strong> {{ test.duration_minutes }} minutes</div>
+        <div><strong>Total Questions:</strong> {{ test.questions.count }}</div>
+        <div><strong>Max Attempts:</strong> {{ test.max_attempts|default:"Unlimited" }}</div>
+        <div><strong>Created:</strong> {{ test.created_at|date:"M d, Y" }}</div>
+        <div><strong>Randomize Order:</strong> {{ test.randomize_order|yesno:"Yes,No" }}</div>
+    </div>
+</div>
+
+<!-- Student Results -->
+<div class="custom-card analytics-card">
+    <h3><i class="fas fa-users"></i> Student Performance</h3>
+    {% if student_results %}
+    <div class="analytics-table-wrapper">
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Email</th>
+                    <th class="text-center">Attempts</th>
+                    <th class="text-center">Best Score</th>
+                    <th class="text-center">Average</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in student_results %}
+                <tr>
+                    <td class="analytics-rank">{{ forloop.counter }}</td>
+                    <td class="analytics-student-name">{{ result.student__username }}</td>
+                    <td>{{ result.student__email|default:"N/A" }}</td>
+                    <td class="text-center">{{ result.attempts_count }}</td>
+                    <td class="text-center analytics-score excellent">{{ result.best_score|floatformat:1 }}</td>
+                    <td class="text-center analytics-score">{{ result.avg_score|floatformat:1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state">
+        <i class="fas fa-inbox empty-state-icon"></i>
+        No student attempts yet.
+    </p>
+    {% endif %}
+</div>
+
+<!-- Question-Level Analytics -->
+<div class="custom-card">
+    <h3><i class="fas fa-question-circle"></i> Question Performance</h3>
+    {% if question_stats %}
+    <div style="overflow-x: auto;">
+        <table class="data-table" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <tr>
+                    <th style="padding: 12px; text-align: left;">Student</th>
+                    <th style="padding: 12px; text-align: center;">Attempt #</th>
+                    <th style="padding: 12px; text-align: center;">Score</th>
+                    <th style="padding: 12px; text-align: center;">Completion Time</th>
+                    <th style="padding: 12px; text-align: center;">Started At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for qs in question_stats %}
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td style="padding: 12px;">{{ qs.question__question_text|truncatewords:15 }}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <span style="background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 12px; font-size: 12px;">
+                            {{ qs.question__type }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; text-align: center;">{{ qs.total_answers }}</td>
+                    <td style="padding: 12px; text-align: center;">{{ qs.avg_score|floatformat:1|default:"N/A" }}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        {% if qs.total_answers > 0 %}
+                            {% widthratio qs.correct_count qs.total_answers 100 %}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="text-align: center; color: #6c757d; padding: 30px;">
+        <i class="fas fa-chart-line" style="font-size: 3rem; display: block; margin-bottom: 15px; opacity: 0.3;"></i>
+        No question analytics available yet.
+    </p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/test-analytics.css' %}">
+{% endblock %}

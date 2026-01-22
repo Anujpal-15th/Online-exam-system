@@ -1,0 +1,12 @@
+Hello {{ user.get_full_name }},
+
+Your {{ site_name }} account has been blocked.
+
+{% if reason %}
+Reason: {{ reason }}
+{% endif %}
+
+If you believe this is a mistake, please contact the administrator.
+
+Best regards,
+The {{ site_name }} Team

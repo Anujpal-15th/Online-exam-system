@@ -1,0 +1,320 @@
+/**
+ * ============================================================================
+ * TABLE COMPONENTS
+ * ============================================================================
+ * 
+ * Consistent table styling across the application.
+ * 
+ * Table Classes:
+ * - .table               : Base table styles
+ * - .table-striped       : Zebra striping on rows
+ * - .table-hover         : Hover effect on rows
+ * - .table-bordered      : Add borders to all cells
+ * - .table-borderless    : Remove all borders
+ * - .table-sm            : Compact table with less padding
+ * - .table-responsive    : Scrollable on mobile
+ * 
+ * Header Classes:
+ * - .table-header-gradient : Purple gradient header (default style)
+ * - .table-header-primary  : Solid primary color header
+ * - .table-header-light    : Light gray header
+ * ============================================================================
+ */
+
+/* ============================================================================
+   BASE TABLE STYLES - MODERN PROFESSIONAL DESIGN
+   ============================================================================ */
+
+.table-container {
+    background-color: var(--color-white);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-white);
+    margin: 0;
+}
+
+/* ============================================================================
+   TABLE HEAD (HEADER) - PROFESSIONAL DESIGN
+   ============================================================================ */
+
+.table thead {
+    background: #f8f9fa;
+    color: #2d1b4e;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.813rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: none;
+}
+
+/* Center alignment for specific columns */
+.table th.text-center,
+.table td.text-center {
+    text-align: center;
+}
+
+.table th.text-right,
+.table td.text-right {
+    text-align: right;
+}
+
+/* ============================================================================
+   TABLE BODY - CLEAN MODERN DESIGN
+   ============================================================================ */
+
+.table tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.15s ease;
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.table td {
+    padding: 14px 16px;
+    font-size: 0.875rem;
+    color: #1a1a1a;
+    vertical-align: middle;
+}
+
+/* ============================================================================
+   TABLE VARIATIONS
+   ============================================================================ */
+
+/* Striped rows - zebra pattern */
+.table-striped tbody tr:nth-child(even) {
+    background-color: var(--color-gray-50);
+}
+
+/* Hover effect on rows */
+.table-hover tbody tr:hover {
+    background-color: var(--color-primary-lighter);
+    cursor: pointer;
+}
+
+/* Bordered table */
+.table-bordered th,
+.table-bordered td {
+    border: var(--border-width-thin) solid var(--color-gray-200);
+}
+
+/* Borderless table */
+.table-borderless th,
+.table-borderless td {
+    border: none;
+}
+
+/* Small/compact table */
+.table-sm th,
+.table-sm td {
+    padding: var(--spacing-2) var(--spacing-3);
+}
+
+/* ============================================================================
+   HEADER VARIATIONS
+   ============================================================================ */
+
+/* Gradient header (default) */
+.table-header-gradient thead {
+    background: var(--gradient-primary);
+}
+
+/* Solid primary header */
+.table-header-primary thead {
+    background-color: var(--color-primary);
+}
+
+/* Light header */
+.table-header-light thead {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-700);
+}
+
+/* ============================================================================
+   RESPONSIVE TABLES
+   ============================================================================ */
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        border-radius: var(--radius-lg);
+        margin: 0 -15px;
+        padding: 0 15px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 10px 8px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+    
+    .table-actions .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .table th,
+    .table td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+    
+    .table-actions .btn {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+    
+    .table-actions .btn i {
+        font-size: 11px;
+    }
+}
+
+/* ============================================================================
+   TABLE ACTIONS (Buttons in table cells)
+   ============================================================================ */
+
+.table-actions {
+    display: flex;
+    gap: var(--spacing-2);
+    justify-content: center;
+    align-items: center;
+}
+
+.table-actions .btn {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   TABLE BADGES (Status indicators)
+   ============================================================================ */
+
+.table td .badge {
+    display: inline-block;
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--radius-full);
+}
+
+.table td .badge-success {
+    background-color: var(--color-success-light);
+    color: var(--color-success-dark);
+}
+
+.table td .badge-warning {
+    background-color: var(--color-warning-light);
+    color: var(--color-warning-dark);
+}
+
+.table td .badge-error {
+    background-color: var(--color-error-light);
+    color: var(--color-error-dark);
+}
+
+.table td .badge-info {
+    background-color: var(--color-info-light);
+    color: var(--color-info-dark);
+}
+
+.table td .badge-primary {
+    background-color: var(--color-primary-lighter);
+    color: var(--color-primary-dark);
+}
+
+/* ============================================================================
+   EMPTY STATE
+   ============================================================================ */
+
+.table-empty {
+    text-align: center;
+    padding: var(--spacing-10) var(--spacing-6);
+    color: var(--color-gray-500);
+}
+
+.table-empty i {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-4);
+    color: var(--color-gray-400);
+    display: block;
+}
+
+.table-empty p {
+    margin: 0;
+    font-size: var(--font-size-base);
+}
+
+/* ============================================================================
+   TABLE FILTERS/SEARCH
+   ============================================================================ */
+
+.table-filters {
+    display: flex;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.table-filters .form-input,
+.table-filters .form-select {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* ============================================================================
+   SORTABLE COLUMNS
+   ============================================================================ */
+
+.table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: var(--spacing-6);
+}
+
+.table th.sortable::after {
+    content: '↕';
+    position: absolute;
+    right: var(--spacing-3);
+    opacity: 0.5;
+}
+
+.table th.sortable:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.table th.sortable.sorted-asc::after {
+    content: '↑';
+    opacity: 1;
+}
+
+.table th.sortable.sorted-desc::after {
+    content: '↓';
+    opacity: 1;
+}

@@ -1,0 +1,163 @@
+{% extends base_template|default:'dashboards/teacher_base.html' %}
+
+{% block title %}Preview Test - {{ test.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-eye"></i> Preview Test</h1>
+</div>
+
+<!-- Test Details Card -->
+<div class="custom-card">
+    <h2 style="color: #667eea; margin-bottom: 20px;">
+        <i class="fas fa-file-alt"></i> {{ test.title }}
+    </h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        <div>
+            <strong><i class="fas fa-user"></i> Created By:</strong>
+            <p>{{ test.created_by.username }}</p>
+        </div>
+        
+        {% if test.subject %}
+        <div>
+            <strong><i class="fas fa-book"></i> Subject:</strong>
+            <p>{{ test.subject }}</p>
+        </div>
+        {% endif %}
+        
+        <div>
+            <strong><i class="fas fa-clock"></i> Duration:</strong>
+            <p>{{ test.duration_minutes }} minutes</p>
+        </div>
+        
+        <div>
+            <strong><i class="fas fa-star"></i> Total Marks:</strong>
+            <p>{{ test.total_marks }} points</p>
+        </div>
+        
+        <div>
+            <strong><i class="fas fa-list-ol"></i> Total Questions:</strong>
+            <p>{{ test_questions.count }}</p>
+        </div>
+        
+        <div>
+            <strong><i class="fas fa-redo"></i> Max Attempts:</strong>
+            <p>{{ test.max_attempts }}</p>
+        </div>
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+        <strong><i class="fas fa-calendar"></i> Created On:</strong>
+        <span>{{ test.created_at|date:"F d, Y H:i" }}</span>
+    </div>
+    
+    {% if test.start_at %}
+    <div style="margin-bottom: 20px;">
+        <strong><i class="fas fa-play"></i> Start Time:</strong>
+        <span>{{ test.start_at|date:"F d, Y H:i" }}</span>
+    </div>
+    {% endif %}
+    
+    {% if test.end_at %}
+    <div style="margin-bottom: 20px;">
+        <strong><i class="fas fa-stop"></i> End Time:</strong>
+        <span>{{ test.end_at|date:"F d, Y H:i" }}</span>
+    </div>
+    {% endif %}
+    
+    <div style="display: flex; gap: 15px; margin-top: 20px;">
+        <div>
+            <strong><i class="fas fa-random"></i> Randomize Order:</strong>
+            {% if test.randomize_order %}
+                <span class="badge badge-success">Yes</span>
+            {% else %}
+                <span class="badge badge-secondary">No</span>
+            {% endif %}
+        </div>
+        
+        <div>
+            <strong><i class="fas fa-eye"></i> Immediate Review:</strong>
+            {% if test.allow_immediate_review %}
+                <span class="badge badge-success">Allowed</span>
+            {% else %}
+                <span class="badge badge-danger">Not Allowed</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Questions List -->
+<div class="custom-card">
+    <h3 style="color: #667eea; margin-bottom: 20px;">
+        <i class="fas fa-question-circle"></i> Test Questions 
+        <span class="badge badge-primary">{{ test_questions.count }}</span>
+    </h3>
+    
+    {% if test_questions %}
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for tq in test_questions %}
+        <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #f8f9fa;">
+            <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: #2c3e50;">
+                    <span class="badge badge-info">Q{{ forloop.counter }}</span>
+                    {% if tq.question.type == 'mcq' %}
+                        <span class="badge badge-type-mcq">MCQ</span>
+                    {% elif tq.question.type == 'tf' %}
+                        <span class="badge badge-type-tf">True/False</span>
+                    {% elif tq.question.type == 'short' %}
+                        <span class="badge badge-type-short">Short Answer</span>
+                    {% elif tq.question.type == 'essay' %}
+                        <span class="badge badge-type-essay">Essay</span>
+                    {% endif %}
+                    <span class="badge badge-success">{{ tq.points }} points</span>
+                </h4>
+            </div>
+            
+            <p style="margin: 10px 0; font-size: 16px; line-height: 1.6;">
+                {{ tq.question.question_text }}
+            </p>
+            
+            {% if tq.question.subject %}
+            <div style="margin-top: 10px;">
+                <span class="badge badge-info">
+                    <i class="fas fa-book"></i> {{ tq.question.subject }}
+                </span>
+            </div>
+            {% endif %}
+            
+            {% if tq.question.difficulty %}
+            <div style="margin-top: 10px;">
+                {% if tq.question.difficulty == 'easy' %}
+                    <span class="badge badge-success">Easy</span>
+                {% elif tq.question.difficulty == 'medium' %}
+                    <span class="badge badge-warning">Medium</span>
+                {% elif tq.question.difficulty == 'hard' %}
+                    <span class="badge badge-danger">Hard</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px; color: #999;">
+        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 10px;"></i>
+        <p>No questions added to this test yet</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Action Buttons -->
+<div style="display: flex; gap: 10px; margin-top: 20px;">
+    {% if user.user_type == 1 %}
+        <a href="{% url 'admin_tests' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Tests
+        </a>
+    {% else %}
+        <a href="{% url 'teachers:test_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Tests
+        </a>
+    {% endif %}
+</div>
+{% endblock %}

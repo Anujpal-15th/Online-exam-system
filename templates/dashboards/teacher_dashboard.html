@@ -1,53 +1,136 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'dashboards/teacher_base.html' %}
 {% block title %}Teacher Dashboard{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-
-<div class="dashboard-container">
-
-  <!-- Sidebar -->
-  <div class="dashboard-sidebar">
-    <h2>Teacher Dashboard</h2>
-    <a href="{% url 'questions_list' %}">Manage Questions</a>
-    <a href="{% url 'submissions_list' %}">All Submissions</a>
-    <a href="{% url 'teacher_reports' %}">Performance Reports</a>
-    <a href="{% url 'mock_test' %}">Mock Test</a>
-    <a href="{% url 'export_performance_csv' %}">Export CSV</a>
-    <a href="{% url 'logout' %}">Logout</a>
-  </div>
-
-  <!-- Main content -->
-  <div class="dashboard-main">
-    <h2>Teacher Dashboard</h2>
-
-    <h3>Latest Submissions</h3>
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Student</th>
-        <th>Question</th>
-        <th>Submitted</th>
-        <th>Graded</th>
-        <th>Score</th>
-        <th>Action</th>
-      </tr>
-      {% for s in latest_submissions %}
-      <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ s.student.username }}</td>
-        <td>{{ s.question.id }}</td>
-        <td>{{ s.submitted_at }}</td>
-        <td>{{ s.graded }}</td>
-        <td>{% if s.score is not None %}{{ s.score }}{% else %}-{% endif %}</td>
-        <td><a href="{% url 'grade_submission' s.id %}">Grade</a></td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="7">No submissions yet.</td></tr>
-      {% endfor %}
-    </table>
-  </div>
-
+<div class="page-header">
+    <h1><i class="fas fa-home"></i> Welcome, {{ user.username }}!</h1>
 </div>
 
+<!-- Stats section -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div>
+            <div class="stat-value">{{ total_questions }}</div>
+            <div class="stat-title">Total Questions</div>
+        </div>
+        <i class="fas fa-question-circle" style="color: #1cc88a;"></i>
+    </div>
+
+    <div class="stat-card">
+        <div>
+            <div class="stat-value">{{ pending_reviews }}</div>
+            <div class="stat-title">Pending Reviews</div>
+        </div>
+        <i class="fas fa-hourglass-half" style="color: #f6c23e;"></i>
+    </div>
+
+    <div class="stat-card">
+        <div>
+            <div class="stat-value">{{ total_submissions }}</div>
+            <div class="stat-title">Total Submissions</div>
+        </div>
+        <i class="fas fa-file-alt" style="color: #e74a3b;"></i>
+    </div>
+</div>
+
+<!-- Recent submissions section -->
+<div class="custom-card">
+    <div class="card-header-section">
+        <h3 class="card-section-title"><i class="fas fa-clipboard-list"></i> Recent Student Submissions</h3>
+        <a href="{% url 'submissions_list' %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-eye"></i> View All
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-list"></i> Type</th>
+                    <th><i class="fas fa-user"></i> Student</th>
+                    <th><i class="fas fa-book"></i> Test/Question</th>
+                    <th class="text-center"><i class="fas fa-calendar"></i> Submitted</th>
+                    <th class="text-center"><i class="fas fa-check-circle"></i> Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in latest_submissions %}
+                <tr>
+                    <td>
+                        {% if s.type == 'test_attempt' %}
+                            <span class="badge" style="background: #e3f2fd; color: #1565c0;">
+                                <i class="fas fa-clipboard-list"></i> Test
+                            </span>
+                        {% else %}
+                            <span class="badge" style="background: #f3e5f5; color: #6a1b9a;">
+                                <i class="fas fa-question-circle"></i> Question
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td><strong>{{ s.student.username }}</strong></td>
+                    <td>
+                        {% if s.type == 'test_attempt' %}
+                            {{ s.test.title }}
+                        {% else %}
+                            <span style="color: #667eea;">Q{{ s.question.id }}</span> - {{ s.question.subject }}
+                        {% endif %}
+                    </td>
+                    <td class="text-center" style="font-size: 0.9rem; color: #666;">
+                        {{ s.submitted_at|date:"M d, Y" }}
+                    </td>
+                    <td class="text-center">
+                        {% if s.graded %}
+                            <span class="badge badge-success">
+                                <i class="fas fa-check"></i> Graded - {{ s.score }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge-warning">
+                                <i class="fas fa-clock"></i> Pending Review
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="table-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>No recent submissions yet.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Notifications -->
+<div class="custom-card">
+    <div class="card-header-section">
+        <h3 class="card-section-title"><i class="fas fa-bell"></i> Recent Notifications</h3>
+        <a href="{% url 'students:notifications' %}" class="btn btn-sm btn-primary">View All</a>
+    </div>
+    <div class="card-body">
+        {% if unread_notifications %}
+            {% for notification in unread_notifications %}
+            <div class="alert alert-info mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1"><strong>{{ notification.title }}</strong></h6>
+                        <p class="mb-1">{{ notification.message }}</p>
+                        <small class="text-muted"><i class="fas fa-clock"></i> {{ notification.created_at|timesince }} ago</small>
+                    </div>
+                    {% if notification.notification_type %}
+                    <span class="badge bg-info">{{ notification.get_notification_type_display }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-bell-slash"></i>
+            <p>No new notifications.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

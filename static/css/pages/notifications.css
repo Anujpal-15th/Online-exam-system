@@ -1,0 +1,125 @@
+/**
+ * ============================================================================
+ * NOTIFICATIONS PAGE STYLES
+ * ============================================================================
+ * 
+ * Styles for student notification page including:
+ * - Notification items (read/unread states)
+ * - Visual indicators for unread notifications
+ * - Notification actions and layout
+ * ============================================================================
+ */
+
+/* ============================================================================
+   NOTIFICATION ITEMS
+   ============================================================================ */
+
+.notification-item {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.notification-item.unread {
+    border-left: 4px solid #667eea;
+    background: #e8ebff;
+}
+
+.notification-item.read {
+    border-left: 4px solid #e0e0e0;
+    background: #f8f9ff;
+}
+
+.notification-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================================
+   NOTIFICATION CONTENT
+   ============================================================================ */
+
+.notification-title {
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.notification-title.unread {
+    font-weight: 600;
+}
+
+.notification-message {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.notification-time {
+    color: #999;
+    font-size: 0.875rem;
+}
+
+/* ============================================================================
+   NOTIFICATION ACTIONS
+   ============================================================================ */
+
+.notification-mark-read {
+    color: #667eea;
+    text-decoration: none;
+    padding: 5px 10px;
+    transition: color 0.3s ease;
+}
+
+.notification-mark-read:hover {
+    color: #4c5fd5;
+}
+
+/* ============================================================================
+   NOTIFICATION CONTAINER
+   ============================================================================ */
+
+.notifications-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.mark-all-read-btn {
+    background: #38ada9;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mark-all-read-btn:hover {
+    background: #2d8a87;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(56, 173, 169, 0.3);
+}
+
+.clear-all-btn {
+    background: #ef4444;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-all-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}

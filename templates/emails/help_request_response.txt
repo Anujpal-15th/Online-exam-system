@@ -1,0 +1,19 @@
+Hello {{ student.get_full_name }},
+
+Your help request has been responded to.
+
+Subject: {{ help_request.subject }}
+
+{% if help_request.admin_response %}
+Response:
+{{ help_request.admin_response }}
+{% endif %}
+
+{% if help_request.status %}
+Status: {{ help_request.get_status_display }}
+{% endif %}
+
+Log in to {{ site_name }} to view the full details.
+
+Best regards,
+The {{ site_name }} Team

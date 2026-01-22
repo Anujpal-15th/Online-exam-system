@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduExam - E-Assessment Platform</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-100 min-h-screen flex items-center justify-center px-4">
+  <!-- Login Container -->
+  <div class="w-full max-w-lg bg-white rounded-xl shadow-2xl p-8">
+    
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-bold text-indigo-700 flex items-center justify-center gap-2">
+        <i class="fas fa-graduation-cap"></i> EduExam
+      </h1>
+      <p class="text-gray-600 mt-1">E-Assessment Platform</p>
+    </div>
+
+    <!-- Login Form -->
+    <form method="POST" class="flex flex-col space-y-4">
+      {% csrf_token %}
+      
+      <!-- Display form-level errors -->
+      {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <!-- Backward compatibility: still show 'error' from context if present -->
+      {% if error %}
+        <p class="text-red-500 text-center">{{ error }}</p>
+      {% endif %}
+      
+      {% if show_resend %}
+        <div class="text-center">
+          <a class="text-blue-500 hover:underline" href="{% url 'resend_verification' %}">
+            Resend verification email
+          </a>
+        </div>
+      {% endif %}
+
+      <!-- Username / Email -->
+      <div>
+        <input type="text" name="username" id="username"
+               class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 w-full focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition ease-in-out duration-150"
+               placeholder="Username or Email" 
+               value="{{ form.username.value|default:'' }}"
+               required />
+        {% if form.username.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Password -->
+      <div>
+        <input type="password" name="password" id="password"
+               class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 w-full focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition ease-in-out duration-150"
+               placeholder="Password" required />
+        {% if form.password.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.password.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Remember Me & Forgot Password -->
+      <div class="flex items-center justify-between flex-wrap text-sm text-gray-900">
+        <label class="flex items-center">
+          <input type="checkbox" name="remember_me" class="mr-2">
+          <span>Remember me</span>
+        </label>
+        <a href="{% url 'password_reset' %}" class="text-blue-500 hover:underline">Forgot password?</a>
+      </div>
+
+      <button type="submit"
+              class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-3 px-4 rounded-md mt-2 hover:from-indigo-600 hover:to-blue-600 transition ease-in-out duration-150">
+        <i class="fas fa-sign-in-alt mr-2"></i> Login
+      </button>
+
+      <p class="text-gray-900 text-center mt-4">
+        Don't have an account? 
+        <a href="{% url 'register' %}" class="text-blue-500 hover:underline">Sign up</a>
+      </p>
+    </form>
+  </div>
+
+</body>
+</html>

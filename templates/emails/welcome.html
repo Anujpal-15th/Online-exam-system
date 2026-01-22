@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .welcome-box { background: white; padding: 30px; margin: 20px 0; border-radius: 10px; text-align: center; }
+        .features { background: white; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .feature-item { padding: 10px 0; border-bottom: 1px solid #eee; }
+        .feature-item:last-child { border-bottom: none; }
+        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 20px; color: #777; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Welcome to {{ site_name }}!</h1>
+        </div>
+        <div class="content">
+            <div class="welcome-box">
+                <h2>Hello {{ user.get_full_name }},</h2>
+                <p style="font-size: 18px;">Your {{ role_name }} account has been successfully created!</p>
+            </div>
+            
+            <div class="features">
+                <h3>What you can do:</h3>
+                {% if user.user_type == 3 %}
+                <div class="feature-item">✅ Take tests and quizzes</div>
+                <div class="feature-item">✅ View your results and performance</div>
+                <div class="feature-item">✅ Access study materials</div>
+                <div class="feature-item">✅ Track your progress</div>
+                {% elif user.user_type == 2 %}
+                <div class="feature-item">✅ Create and manage questions</div>
+                <div class="feature-item">✅ Build and schedule tests</div>
+                <div class="feature-item">✅ Grade student submissions</div>
+                <div class="feature-item">✅ View analytics and reports</div>
+                {% elif user.user_type == 1 %}
+                <div class="feature-item">✅ Manage users and roles</div>
+                <div class="feature-item">✅ Monitor system activity</div>
+                <div class="feature-item">✅ Review and approve content</div>
+                <div class="feature-item">✅ Access all administrative features</div>
+                {% endif %}
+            </div>
+            
+            <p style="text-align: center;">
+                <a href="{{ request.scheme }}://{{ request.get_host }}" class="btn">Get Started</a>
+            </p>
+            
+            <p>If you have any questions, please don't hesitate to contact us.</p>
+            
+            <div class="footer">
+                <p>Best regards,<br>The {{ site_name }} Team</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

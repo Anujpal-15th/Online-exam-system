@@ -1,0 +1,212 @@
+/**
+ * ============================================================================
+ * MAIN CSS FILE - Online Exam System
+ * ============================================================================
+ * 
+ * This is the MASTER CSS file that imports all other stylesheets.
+ * Include ONLY this file in your HTML templates.
+ * 
+ * IMPORTANT: Order matters! CSS files are loaded in this specific order:
+ * 1. Variables (must be first - defines all design tokens)
+ * 2. Reset (normalizes browser defaults)
+ * 3. Core Styles (base element styling)
+ * 4. Layout Styles (navbar, sidebar, dashboard structure)
+ * 5. Components (buttons, forms, tables, cards, etc.)
+ * 6. Utilities (helper classes for quick styling)
+ * 
+ * HOW TO USE THIS SYSTEM:
+ * ======================
+ * 
+ * In your Django templates, replace all old CSS imports with:
+ * <link rel="stylesheet" href="{% static 'css/main.css' %}">
+ * 
+ * CHANGING THE THEME:
+ * ===================
+ * 
+ * To change colors across the ENTIRE application:
+ * 1. Open: static/css/core/variables.css
+ * 2. Modify the color values in the :root section
+ * 3. Save the file
+ * 4. Hard refresh your browser (Ctrl+Shift+R)
+ * 5. ALL pages will update automatically!
+ * 
+ * Example: Change purple theme to blue:
+ * --color-primary-start: #667eea;  →  --color-primary-start: #3b82f6;
+ * --color-primary-end: #764ba2;    →  --color-primary-end: #1e40af;
+ * 
+ * MODIFYING COMPONENTS:
+ * ====================
+ * 
+ * To change button styles:     → Edit: static/css/components/buttons.css
+ * To change form styles:       → Edit: static/css/components/forms.css
+ * To change table styles:      → Edit: static/css/components/tables.css
+ * To change card styles:       → Edit: static/css/components/cards.css
+ * To change navbar:            → Edit: static/css/layouts/navbar.css
+ * To change sidebar:           → Edit: static/css/layouts/sidebar.css
+ * To change dashboard layout:  → Edit: static/css/layouts/dashboard.css
+ * 
+ * ADDING NEW STYLES:
+ * ==================
+ * 
+ * 1. For new colors/spacing/fonts:  → Add to core/variables.css
+ * 2. For new reusable components:   → Create file in components/
+ * 3. For new layout structures:     → Create file in layouts/
+ * 4. Then import it in this file
+ * 
+ * ============================================================================
+ */
+
+/* ============================================================================
+   1. CORE STYLES (Foundation)
+   ============================================================================ */
+
+/* Design tokens - colors, spacing, typography, etc. */
+@import url('core/variables.css');
+
+/* Browser reset and base element styles */
+@import url('core/reset.css');
+
+/* ============================================================================
+   2. LAYOUT STYLES (Page Structure)
+   ============================================================================ */
+
+/* Top navigation bar */
+@import url('layouts/navbar.css');
+
+/* Side navigation for dashboards */
+@import url('layouts/sidebar.css');
+
+/* Dashboard main content area */
+@import url('layouts/dashboard.css');
+
+/* ============================================================================
+   3. COMPONENT STYLES (Reusable UI Elements)
+   ============================================================================ */
+
+/* Buttons - all button types and sizes */
+@import url('components/buttons.css');
+
+/* Forms - inputs, selects, textareas, checkboxes */
+@import url('components/forms.css');
+
+/* Tables - data tables with sorting and filtering */
+@import url('components/tables.css');
+
+/* Cards - content containers */
+@import url('components/cards.css');
+
+/* Badges - status indicators and labels */
+@import url('components/badges.css');
+
+/* Mobile menu - hamburger button and overlay */
+@import url('components/mobile-menu.css');
+
+/* Utilities - helper classes */
+@import url('components/utilities.css');
+
+/* ============================================================================
+   4. PAGE-SPECIFIC STYLES
+   ============================================================================ */
+
+/* Question pages, test interface, grading, leaderboard */
+@import url('pages/pages.css');
+
+/* ============================================================================
+   5. GLOBAL OVERRIDES (Final touches)
+   ============================================================================ */
+
+/**
+ * Any global styles that don't fit in other files can go here.
+ * Try to keep this section minimal - most styles should be in their
+ * respective component/layout files.
+ */
+
+/* Smooth transitions for theme changes */
+* {
+    transition-property: color, background-color, border-color;
+    transition-duration: 200ms;
+    transition-timing-function: ease-in-out;
+}
+
+/* But don't transition layout properties */
+*:not(.transition-all) {
+    transition-property: color, background-color, border-color;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Disabled states */
+[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Focus outline for accessibility */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+/* ============================================================================
+   6. PRINT STYLES
+   ============================================================================ */
+
+@media print {
+    /* Hide non-essential elements when printing */
+    .navbar,
+    .sidebar,
+    .btn,
+    .no-print {
+        display: none !important;
+    }
+    
+    /* Full width for print */
+    .dashboard-main {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    /* Remove shadows and backgrounds */
+    * {
+        box-shadow: none !important;
+        background: white !important;
+        color: black !important;
+    }
+}
+
+/* ============================================================================
+   END OF MAIN.CSS
+   ============================================================================
+   
+   TROUBLESHOOTING:
+   ================
+   
+   Q: Styles not applying?
+   A: 1. Check browser console for 404 errors
+      2. Clear browser cache (Ctrl+Shift+Delete)
+      3. Verify file paths in @import statements
+      4. Check if Django collectstatic was run
+   
+   Q: Some pages look different?
+   A: 1. Ensure all templates use {% load static %}
+      2. Check if inline styles are overriding CSS
+      3. Verify template extends correct base template
+   
+   Q: Want to add custom styles?
+   A: 1. Identify if it's a variable, component, or layout
+      2. Add to appropriate file
+      3. Use existing CSS classes first before creating new ones
+   
+   For more help, see documentation in each individual CSS file.
+   ============================================================================
+ */

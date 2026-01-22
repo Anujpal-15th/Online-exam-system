@@ -1,0 +1,193 @@
+/**
+ * ============================================================================
+ * RESET & BASE STYLES
+ * ============================================================================
+ * 
+ * This file contains:
+ * 1. CSS Reset - Removes browser inconsistencies
+ * 2. Base Element Styles - Default styling for HTML elements
+ * 3. Typography Base - Font settings for body text
+ * ============================================================================
+ */
+
+/* ============================================================================
+   1. CSS RESET
+   ============================================================================ */
+
+/* Box sizing - All elements use border-box for easier sizing */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Remove default list styling */
+ul, ol {
+    list-style: none;
+}
+
+/* Remove default link styling (we'll add custom styles) */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Remove button default styles */
+button {
+    border: none;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+/* Remove input number arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Images responsive by default */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ============================================================================
+   2. BASE HTML ELEMENT STYLES
+   ============================================================================ */
+
+html {
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+    
+    /* Better font rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--color-gray-800);
+    background-color: var(--color-gray-50);
+    min-height: 100vh;
+}
+
+/* ============================================================================
+   3. TYPOGRAPHY BASE
+   ============================================================================ */
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    color: var(--color-gray-900);
+}
+
+h1 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-6);
+}
+
+h2 {
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-5);
+}
+
+h3 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-4);
+}
+
+h4 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-3);
+}
+
+h5 {
+    font-size: var(--font-size-md);
+    margin-bottom: var(--spacing-3);
+}
+
+h6 {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-2);
+}
+
+/* Paragraphs */
+p {
+    margin-bottom: var(--spacing-4);
+}
+
+/* Links */
+a {
+    color: var(--color-primary);
+    transition: var(--transition-colors);
+}
+
+a:hover {
+    color: var(--color-primary-dark);
+}
+
+/* Strong and Bold */
+strong, b {
+    font-weight: var(--font-weight-bold);
+}
+
+/* Emphasis */
+em, i {
+    font-style: italic;
+}
+
+/* Code */
+code, pre {
+    font-family: var(--font-mono);
+    background-color: var(--color-gray-100);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+}
+
+pre {
+    display: block;
+    padding: var(--spacing-4);
+    overflow-x: auto;
+    margin-bottom: var(--spacing-4);
+}
+
+/* Horizontal Rule */
+hr {
+    border: 0;
+    border-top: var(--border-width-thin) solid var(--color-gray-200);
+    margin: var(--spacing-6) 0;
+}
+
+/* ============================================================================
+   4. ACCESSIBILITY
+   ============================================================================ */
+
+/* Focus styles for keyboard navigation */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}

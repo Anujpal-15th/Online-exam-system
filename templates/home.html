@@ -4,43 +4,223 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EduExam - Home</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <title>EduExam - Online Examination Platform</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="{% static 'css/pages/home.css' %}" rel="stylesheet" />
 </head>
 <body>
-  <div class="login-container">
-    <div class="login-card">
-      <div class="login-header">
-        <h1><i class="fas fa-graduation-cap"></i> EduExam</h1>
-        <p>E-Assessment Platform</p>
-      </div>
-
-      <div class="role-selection">
-        <h3>Get Started</h3>
-        <div class="role-buttons">
-          <a class="role-btn" href="{% url 'login' %}">
-            <i class="fas fa-right-to-bracket"></i>
-            <span>Login</span>
-          </a>
-          <a class="role-btn" href="{% url 'register' %}">
-            <i class="fas fa-user-plus"></i>
-            <span>Register</span>
-          </a>
-          <a class="role-btn" href="{% url 'questions_list' %}">
-            <i class="fas fa-list-check"></i>
-            <span>Browse Questions</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="demo-credentials">
-        <h4>About</h4>
-        <div class="demo-cred">Teachers can add/edit/delete questions and grade submissions.</div>
-        <div class="demo-cred">Students can view questions and submit answers.</div>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'home' %}" class="logo">
+        <i class="fas fa-graduation-cap"></i>
+        <span>EduExam</span>
+      </a>
+      <div class="nav-links">
+        <a href="{% url 'login' %}" class="nav-btn login">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+        <a href="{% url 'register' %}" class="nav-btn register">
+          <i class="fas fa-user-plus"></i> Register
+        </a>
       </div>
     </div>
-  </div>
+  </nav>
+
+  <section class="hero">
+    <h1>Modern Online Examination<br>Platform for Institutions</h1>
+    <p>
+      Streamline your assessment process with our enterprise-grade examination platform. 
+      Trusted by educational institutions for creating, delivering, and managing digital assessments at scale.
+    </p>
+    <div class="hero-buttons">
+      <a href="{% url 'register' %}" class="hero-btn primary">
+        <i class="fas fa-rocket"></i> Get Started
+      </a>
+      <a href="{% url 'login' %}" class="hero-btn secondary">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="features-container">
+      <h2 class="section-title">Comprehensive Examination Management</h2>
+      <p class="section-subtitle">
+        A complete ecosystem for digital assessments with advanced features and enterprise-grade security
+      </p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-pen-to-square"></i>
+          </div>
+          <h3>Advanced Test Creation</h3>
+          <p>
+            Create sophisticated assessments with multiple question formats, rich media support, 
+            and intelligent question banks. Customize difficulty levels and marking schemes with ease.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <h3>Flexible Scheduling</h3>
+          <p>
+            Schedule examinations with precision. Configure start and end times, set access windows, 
+            and manage multiple concurrent test sessions through our intuitive Paper Builder interface.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3>Advanced Analytics</h3>
+          <p>
+            Gain deep insights into student performance with comprehensive analytics dashboards. 
+            Track trends, identify learning gaps, and generate detailed performance reports.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-halved"></i>
+          </div>
+          <h3>Enterprise Security</h3>
+          <p>
+            Built with security at its core. Role-based access control, secure authentication, 
+            and data encryption ensure your assessment data remains protected at all times.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-users-gear"></i>
+          </div>
+          <h3>Role-Based Access</h3>
+          <p>
+            Separate dashboards for teachers and students. Each role has 
+            tailored features and permissions optimized for their specific workflow needs.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-laptop-code"></i>
+          </div>
+          <h3>Modern Technology</h3>
+          <p>
+            Built on Django framework with PostgreSQL database. Responsive design ensures 
+            seamless access across all devices - desktop, tablet, and mobile platforms.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="roles">
+    <div class="roles-container">
+      <h2 class="section-title">Purpose-Built for Educational Excellence</h2>
+      <p class="section-subtitle">
+        Streamlined workflows and specialized tools designed for every stakeholder in the assessment process
+      </p>
+
+      <div class="roles-grid">
+        <div class="role-card">
+          <div class="role-icon">
+            <i class="fas fa-chalkboard-user"></i>
+          </div>
+          <h3>Educator Tools</h3>
+          <ul>
+            <li><i class="fas fa-check"></i> Question bank management</li>
+            <li><i class="fas fa-check"></i> Test builder and scheduling</li>
+            <li><i class="fas fa-check"></i> Automated and manual grading</li>
+            <li><i class="fas fa-check"></i> Performance analytics and insights</li>
+            <li><i class="fas fa-check"></i> Study material distribution</li>
+            <li><i class="fas fa-check"></i> Student progress tracking</li>
+          </ul>
+        </div>
+
+        <div class="role-card">
+          <div class="role-icon">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <h3>Student Portal</h3>
+          <ul>
+            <li><i class="fas fa-check"></i> Intuitive test-taking interface</li>
+            <li><i class="fas fa-check"></i> Real-time result access</li>
+            <li><i class="fas fa-check"></i> Performance history and analytics</li>
+            <li><i class="fas fa-check"></i> Learning resource library</li>
+            <li><i class="fas fa-check"></i> Attempt review and feedback</li>
+            <li><i class="fas fa-check"></i> Progress dashboard</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-section">
+    <div class="stats-container">
+      <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Secure & Reliable</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">Platform Availability</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">∞</div>
+        <div class="stat-label">Unlimited Tests</div>
+      </div>
+        <div class="stat-item">
+        <div class="stat-number">2</div>
+        <div class="stat-label">User Roles</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-container">
+      <h2>Ready to Transform Your Assessment Process?</h2>
+      <p>Join institutions using EduExam for efficient, secure, and modern online examinations</p>
+      <div class="cta-buttons">
+        <a href="{% url 'register' %}" class="cta-btn primary">
+          <i class="fas fa-rocket"></i> Create Account
+        </a>
+        <a href="{% url 'login' %}" class="cta-btn secondary">
+          <i class="fas fa-sign-in-alt"></i> Access Platform
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <h3><i class="fas fa-graduation-cap"></i> EduExam</h3>
+          <p>Enterprise-grade online examination platform for modern educational institutions</p>
+        </div>
+        <div class="footer-section">
+          <h4>Platform</h4>
+          <a href="{% url 'home' %}" class="footer-link">Home</a>
+          <a href="{% url 'login' %}" class="footer-link">Login</a>
+          <a href="{% url 'register' %}" class="footer-link">Register</a>
+        </div>
+        <div class="footer-section">
+          <h4>Resources</h4>
+          <a href="#" class="footer-link">Documentation</a>
+          <a href="#" class="footer-link">Support</a>
+          <a href="#" class="footer-link">Privacy Policy</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 EduExam. All rights reserved. Built with Django & PostgreSQL</p>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
 

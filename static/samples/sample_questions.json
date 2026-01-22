@@ -1,0 +1,40 @@
+[
+  {
+    "type": "mcq_single",
+    "question_text": "Which law relates force, mass, and acceleration?",
+    "options": ["Boyle's law", "Newton's second law", "Ohm's law", "Hooke's law"],
+    "correct": 2,
+    "subject": "Physics",
+    "topic": "Mechanics",
+    "difficulty": "easy"
+  },
+  {
+    "type": "true_false",
+    "question_text": "The Earth revolves around the Sun.",
+    "correct": true,
+    "subject": "Science",
+    "difficulty": "easy"
+  },
+  {
+    "type": "fill_in",
+    "question_text": "The chemical symbol for water is ____.",
+    "answers": ["h2o", "H2O"],
+    "subject": "Chemistry",
+    "difficulty": "easy"
+  },
+  {
+    "type": "matching",
+    "question_text": "Match the country to its capital.",
+    "matching_pairs": {"France": "Paris", "Japan": "Tokyo"},
+    "subject": "Geography",
+    "difficulty": "medium"
+  },
+  {
+    "type": "numerical",
+    "question_text": "What is the value of π to 2 decimal places?",
+    "value": 3.14,
+    "margin": 0.01,
+    "subject": "Maths",
+    "difficulty": "medium"
+  }
+]

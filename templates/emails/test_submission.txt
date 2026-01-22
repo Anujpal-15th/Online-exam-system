@@ -1,0 +1,13 @@
+Hello {{ student.get_full_name }},
+
+Your test has been successfully submitted!
+
+Test: {{ test.title }}
+Submitted on: {{ attempt.submitted_at|date:"F d, Y - g:i A" }}
+
+Your responses have been recorded. You will be notified once your test is graded.
+
+Thank you for completing the test!
+
+Best regards,
+The {{ site_name }} Team

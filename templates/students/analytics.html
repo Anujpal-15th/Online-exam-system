@@ -1,0 +1,269 @@
+{% extends 'dashboards/student_base.html' %}
+{% load static %}
+
+{% block title %}Performance Analytics{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-chart-line me-2"></i>Performance Analytics
+            </h1>
+            <p class="text-muted">Track your progress and identify areas for improvement</p>
+        </div>
+    </div>
+
+    <!-- Key Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-clipboard-check text-primary"></i>
+            <h3 class="stat-value">{{ total_attempts }}</h3>
+            <p class="stat-label">Total Exams Taken</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-star text-warning"></i>
+            <h3 class="stat-value">{{ avg_score }}%</h3>
+            <p class="stat-label">Average Score</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-trophy text-success"></i>
+            <h3 class="stat-value">{{ highest_score }}%</h3>
+            <p class="stat-label">Highest Score</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-clock text-info"></i>
+            <h3 class="stat-value">{{ total_time_spent.total_seconds|floatformat:0|default:"0" }}</h3>
+            <p class="stat-label">Seconds Studied</p>
+        </div>
+    </div>
+
+    <!-- Improvement Indicator -->
+    {% if improvement != 0 %}
+    <div class="custom-card">
+        <div class="text-center py-3">
+            <h5 class="mb-3"><i class="fas fa-chart-area me-2"></i>Performance Trend</h5>
+            {% if improvement > 0 %}
+            <span class="badge bg-success" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">
+                <i class="fas fa-arrow-up me-2"></i>+{{ improvement }}% improvement in recent tests!
+            </span>
+            {% else %}
+            <span class="badge bg-warning" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">
+                <i class="fas fa-arrow-down me-2"></i>{{ improvement }}% drop - Keep practicing!
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Performance Trend Chart -->
+    <div class="custom-card">
+        <div class="card-header-section">
+            <h3 class="card-section-title">
+                <i class="fas fa-chart-line me-2"></i>Score Trend (Last 20 Tests)
+            </h3>
+        </div>
+        <div class="card-body" style="height: 350px;">
+            <canvas id="performanceTrendChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Subject & Difficulty Analysis -->
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="custom-card">
+                <div class="card-header-section">
+                    <h3 class="card-section-title">
+                        <i class="fas fa-book me-2"></i>Subject-wise Performance
+                    </h3>
+                </div>
+                <div class="card-body" style="height: 350px;">
+                    <canvas id="subjectChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="custom-card">
+                <div class="card-header-section">
+                    <h3 class="card-section-title">
+                        <i class="fas fa-signal me-2"></i>Accuracy by Difficulty
+                    </h3>
+                </div>
+                <div class="card-body" style="height: 350px;">
+                    <canvas id="difficultyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Analysis & Question Types -->
+    <div class="row g-3 mt-1">
+        <div class="col-lg-6">
+            <div class="custom-card">
+                <div class="card-header-section">
+                    <h3 class="card-section-title">
+                        <i class="fas fa-hourglass-half me-2"></i>Time Spent Per Test
+                    </h3>
+                </div>
+                <div class="card-body" style="height: 350px;">
+                    <canvas id="timeChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="custom-card">
+                <div class="card-header-section">
+                    <h3 class="card-section-title">
+                        <i class="fas fa-question-circle me-2"></i>Accuracy by Question Type
+                    </h3>
+                </div>
+                <div class="card-body" style="height: 350px;">
+                    <canvas id="questionTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights & Recommendations -->
+    <div class="custom-card mt-3">
+        <div class="card-header-section">
+            <h3 class="card-section-title">
+                <i class="fas fa-lightbulb me-2"></i>Insights & Recommendations
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-4 bg-light rounded text-center">
+                        <i class="fas fa-target fa-2x text-primary mb-3"></i>
+                        <h6 class="fw-bold">Focus Areas</h6>
+                        <p class="mb-0 small text-muted">Review your difficulty analysis to identify weak topics</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 bg-light rounded text-center">
+                        <i class="fas fa-brain fa-2x text-success mb-3"></i>
+                        <h6 class="fw-bold">Study Strategy</h6>
+                        <p class="mb-0 small text-muted">Practice more questions in subjects with lower scores</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 bg-light rounded text-center">
+                        <i class="fas fa-rocket fa-2x text-warning mb-3"></i>
+                        <h6 class="fw-bold">Improvement Tip</h6>
+                        <p class="mb-0 small text-muted">Take regular tests to track your progress over time</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart.js default configuration
+    Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    Chart.defaults.plugins.legend.display = true;
+    Chart.defaults.plugins.legend.position = 'top';
+    
+    // Performance Trend Chart (Line)
+    loadChart('performanceTrendChart', 'performance_trend', 'line');
+    
+    // Subject Performance Chart (Bar)
+    loadChart('subjectChart', 'subject_performance', 'bar');
+    
+    // Difficulty Analysis Chart (Radar)
+    loadChart('difficultyChart', 'difficulty_analysis', 'radar');
+    
+    // Time Analysis Chart (Bar)
+    loadChart('timeChart', 'time_analysis', 'bar');
+    
+    // Question Type Chart (Horizontal Bar)
+    loadChart('questionTypeChart', 'question_type_accuracy', 'bar');
+});
+
+function loadChart(canvasId, chartType, displayType) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    
+    // Show loading state
+    const canvas = document.getElementById(canvasId);
+    const parent = canvas.parentElement;
+    parent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+    
+    fetch(`{% url 'students:analytics_chart_data' %}?type=${chartType}`)
+        .then(response => response.json())
+        .then(data => {
+            // Restore canvas
+            parent.innerHTML = `<canvas id="${canvasId}"></canvas>`;
+            const newCtx = document.getElementById(canvasId).getContext('2d');
+            
+            const config = {
+                type: displayType,
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: chartType !== 'performance_trend',
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            }
+                        }
+                    },
+                    scales: displayType !== 'radar' ? {
+                        y: {
+                            beginAtZero: true,
+                            max: chartType.includes('accuracy') || chartType.includes('performance') ? 100 : undefined,
+                            ticks: {
+                                callback: function(value) {
+                                    if (chartType.includes('time')) {
+                                        return value + ' min';
+                                    } else if (chartType.includes('accuracy') || chartType.includes('performance')) {
+                                        return value + '%';
+                                    }
+                                    return value;
+                                }
+                            }
+                        }
+                    } : {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // Special configuration for horizontal bar
+            if (canvasId === 'questionTypeChart') {
+                config.options.indexAxis = 'y';
+            }
+            
+            new Chart(newCtx, config);
+        })
+        .catch(error => {
+            console.error('Error loading chart:', error);
+            parent.innerHTML = '<div class="text-center text-danger"><i class="fas fa-exclamation-triangle"></i> Error loading chart</div>';
+        });
+}
+</script>
+{% endblock %}

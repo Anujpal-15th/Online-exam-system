@@ -1,0 +1,268 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - EduExam</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-100 min-h-screen flex items-center justify-center px-4 py-8">
+  <!-- Register Container -->
+  <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-8">
+    
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-bold text-indigo-700 flex items-center justify-center gap-2">
+        <i class="fas fa-graduation-cap"></i> EduExam
+      </h1>
+      <p class="text-gray-600 mt-1">Create Your Account</p>
+    </div>
+
+    {% if error %}
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+      </div>
+    {% endif %}
+
+    <!-- Role Selection -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <button type="button" id="teacherRoleBtn" onclick="selectRole('teacher')"
+              class="p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition text-center focus:outline-none">
+        <i class="fas fa-chalkboard-user text-3xl text-gray-400 mb-2 block"></i>
+        <span class="font-semibold text-gray-700">Teacher</span>
+      </button>
+      <button type="button" id="studentRoleBtn" onclick="selectRole('student')"
+              class="p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition text-center focus:outline-none">
+        <i class="fas fa-user-graduate text-3xl text-gray-400 mb-2 block"></i>
+        <span class="font-semibold text-gray-700">Student</span>
+      </button>
+    </div>
+
+    <form method="POST" id="registrationForm" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="user_type" id="userType" value="">
+
+      <!-- Common Fields -->
+      <div class="grid grid-cols-1 gap-4">
+        <input type="text" name="full_name" required value="{{ request.POST.full_name|default:'' }}"
+               class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+               placeholder="Full Name *" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" name="username" required value="{{ request.POST.username|default:'' }}"
+               class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+               placeholder="Username *" />
+        <input type="email" name="email" required value="{{ request.POST.email|default:'' }}"
+               class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+               placeholder="Email *" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="password" name="password" required minlength="6"
+               class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+               placeholder="Password *" />
+        <input type="password" name="confirm_password" required minlength="6"
+               class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+               placeholder="Confirm Password *" />
+      </div>
+
+      <!-- Teacher-Specific Fields -->
+      <div id="teacherFields" class="hidden space-y-4">
+        <input type="text" name="department" placeholder="Department * (e.g., Computer Science)" value="{{ request.POST.department|default:'' }}"
+               class="w-full bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition" />
+
+        <input type="text" name="specialization" placeholder="Specialization * (e.g., Data Structures, Algorithms)" value="{{ request.POST.specialization|default:'' }}"
+               class="w-full bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="text" name="qualification" placeholder="Qualification (e.g., M.Tech, PhD)" value="{{ request.POST.qualification|default:'' }}"
+                 class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition" />
+          <input type="number" name="experience_years" min="0" placeholder="Experience (Years)" value="{{ request.POST.experience_years|default:'' }}"
+                 class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition" />
+        </div>
+      </div>
+
+      <!-- Student-Specific Fields -->
+      <div id="studentFields" class="hidden space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="text" name="roll_number" placeholder="Roll Number * (e.g., 2024CS001)" value="{{ request.POST.roll_number|default:'' }}"
+                 class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition" />
+          <select name="course"
+                  class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition">
+            <option value="">Select Course *</option>
+            <option value="btech" {% if request.POST.course == 'btech' %}selected{% endif %}>B.Tech</option>
+            <option value="mtech" {% if request.POST.course == 'mtech' %}selected{% endif %}>M.Tech</option>
+            <option value="bca" {% if request.POST.course == 'bca' %}selected{% endif %}>BCA</option>
+            <option value="mca" {% if request.POST.course == 'mca' %}selected{% endif %}>MCA</option>
+            <option value="bsc" {% if request.POST.course == 'bsc' %}selected{% endif %}>B.Sc</option>
+            <option value="msc" {% if request.POST.course == 'msc' %}selected{% endif %}>M.Sc</option>
+            <option value="ba" {% if request.POST.course == 'ba' %}selected{% endif %}>BA</option>
+            <option value="ma" {% if request.POST.course == 'ma' %}selected{% endif %}>MA</option>
+            <option value="bba" {% if request.POST.course == 'bba' %}selected{% endif %}>BBA</option>
+            <option value="mba" {% if request.POST.course == 'mba' %}selected{% endif %}>MBA</option>
+            <option value="other" {% if request.POST.course == 'other' %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+
+        <input type="text" name="branch" placeholder="Branch/Department * (e.g., Computer Science)" value="{{ request.POST.branch|default:'' }}"
+               class="w-full bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <select name="year"
+                  class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition">
+            <option value="">Select Year *</option>
+            <option value="1" {% if request.POST.year == '1' %}selected{% endif %}>First Year</option>
+            <option value="2" {% if request.POST.year == '2' %}selected{% endif %}>Second Year</option>
+            <option value="3" {% if request.POST.year == '3' %}selected{% endif %}>Third Year</option>
+            <option value="4" {% if request.POST.year == '4' %}selected{% endif %}>Fourth Year</option>
+            <option value="5" {% if request.POST.year == '5' %}selected{% endif %}>Fifth Year</option>
+          </select>
+          <select name="semester"
+                  class="bg-gray-100 text-gray-900 border-0 rounded-md p-3 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition">
+            <option value="">Select Semester *</option>
+            <option value="1" {% if request.POST.semester == '1' %}selected{% endif %}>Semester 1</option>
+            <option value="2" {% if request.POST.semester == '2' %}selected{% endif %}>Semester 2</option>
+            <option value="3" {% if request.POST.semester == '3' %}selected{% endif %}>Semester 3</option>
+            <option value="4" {% if request.POST.semester == '4' %}selected{% endif %}>Semester 4</option>
+            <option value="5" {% if request.POST.semester == '5' %}selected{% endif %}>Semester 5</option>
+            <option value="6" {% if request.POST.semester == '6' %}selected{% endif %}>Semester 6</option>
+            <option value="7" {% if request.POST.semester == '7' %}selected{% endif %}>Semester 7</option>
+            <option value="8" {% if request.POST.semester == '8' %}selected{% endif %}>Semester 8</option>
+            <option value="9" {% if request.POST.semester == '9' %}selected{% endif %}>Semester 9</option>
+            <option value="10" {% if request.POST.semester == '10' %}selected{% endif %}>Semester 10</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" id="submitBtn" disabled
+              class="w-full bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-3 px-4 rounded-md hover:from-indigo-600 hover:to-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed">
+        <i class="fas fa-user-plus mr-2"></i> Create Account
+      </button>
+
+      <p class="text-gray-900 text-center mt-4">
+        Already have an account? 
+        <a href="{% url 'login' %}" class="text-blue-500 hover:underline">Login here</a>
+      </p>
+    </form>
+  </div>
+
+  <script>
+    let selectedRole = null;
+
+    function selectRole(role) {
+      selectedRole = role;
+      
+      const teacherBtn = document.getElementById('teacherRoleBtn');
+      const studentBtn = document.getElementById('studentRoleBtn');
+      const teacherFields = document.getElementById('teacherFields');
+      const studentFields = document.getElementById('studentFields');
+      
+      // Reset all buttons and fields
+      teacherBtn.classList.remove('border-indigo-500', 'bg-indigo-500');
+      teacherBtn.classList.add('border-gray-200');
+      teacherBtn.querySelector('i').classList.remove('text-white');
+      teacherBtn.querySelector('i').classList.add('text-gray-400');
+      teacherBtn.querySelector('span').classList.remove('text-white');
+      teacherBtn.querySelector('span').classList.add('text-gray-700');
+      
+      studentBtn.classList.remove('border-indigo-500', 'bg-indigo-500');
+      studentBtn.classList.add('border-gray-200');
+      studentBtn.querySelector('i').classList.remove('text-white');
+      studentBtn.querySelector('i').classList.add('text-gray-400');
+      studentBtn.querySelector('span').classList.remove('text-white');
+      studentBtn.querySelector('span').classList.add('text-gray-700');
+      
+      teacherFields.classList.add('hidden');
+      studentFields.classList.add('hidden');
+      
+      if (role === 'teacher') {
+        teacherBtn.classList.remove('border-gray-200');
+        teacherBtn.classList.add('border-indigo-500', 'bg-indigo-500');
+        teacherBtn.querySelector('i').classList.remove('text-gray-400');
+        teacherBtn.querySelector('i').classList.add('text-white');
+        teacherBtn.querySelector('span').classList.remove('text-gray-700');
+        teacherBtn.querySelector('span').classList.add('text-white');
+        
+        teacherFields.classList.remove('hidden');
+        document.getElementById('userType').value = '2';
+        
+        // Make teacher fields required
+        document.querySelectorAll('#teacherFields input[name="department"], #teacherFields input[name="specialization"]').forEach(input => {
+          input.required = true;
+        });
+        
+        // Remove required from student fields
+        document.querySelectorAll('#studentFields input, #studentFields select').forEach(input => {
+          input.required = false;
+        });
+      } else if (role === 'student') {
+        studentBtn.classList.remove('border-gray-200');
+        studentBtn.classList.add('border-indigo-500', 'bg-indigo-500');
+        studentBtn.querySelector('i').classList.remove('text-gray-400');
+        studentBtn.querySelector('i').classList.add('text-white');
+        studentBtn.querySelector('span').classList.remove('text-gray-700');
+        studentBtn.querySelector('span').classList.add('text-white');
+        
+        studentFields.classList.remove('hidden');
+        document.getElementById('userType').value = '3';
+        
+        // Make student fields required
+        document.querySelectorAll('#studentFields input[name="roll_number"], #studentFields input[name="branch"], #studentFields select[name="course"], #studentFields select[name="year"], #studentFields select[name="semester"]').forEach(input => {
+          input.required = true;
+        });
+        
+        // Remove required from teacher fields
+        document.querySelectorAll('#teacherFields input').forEach(input => {
+          input.required = false;
+        });
+      }
+      
+      // Enable submit button
+      document.getElementById('submitBtn').disabled = false;
+    }
+
+    // Form validation
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+      if (!selectedRole) {
+        e.preventDefault();
+        alert('Please select a role (Teacher or Student)');
+        return;
+      }
+      
+      const password = document.querySelector('input[name="password"]').value;
+      const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+      
+      if (password !== confirmPassword) {
+        e.preventDefault();
+        alert('Passwords do not match!');
+        return;
+      }
+      
+      if (password.length < 6) {
+        e.preventDefault();
+        alert('Password must be at least 6 characters long!');
+        return;
+      }
+    });
+
+    // Pre-select role if coming back with error, otherwise default to student
+    const userTypeFromServer = '{{ request.POST.user_type|default:"" }}';
+    if (userTypeFromServer === '2') {
+      selectRole('teacher');
+    } else if (userTypeFromServer === '3') {
+      selectRole('student');
+    } else {
+      // Default to student on page load
+      selectRole('student');
+    }
+  </script>
+</body>
+</html>

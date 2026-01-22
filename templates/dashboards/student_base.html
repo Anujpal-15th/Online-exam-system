@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block portal_title %}Student Portal{% endblock %}
+
+{% block sidebar %}
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">DASHBOARD</div>
+        <a href="{% url 'student_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i> Overview
+        </a>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">MY EXAMS</div>
+        <a href="{% url 'student_all_exams' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_all_exams' %}active{% endif %}">
+            <i class="fas fa-list"></i> All Exams
+        </a>
+        <a href="{% url 'student_upcoming_exams' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_upcoming_exams' %}active{% endif %}">
+            <i class="fas fa-clock"></i> Upcoming
+        </a>
+        <a href="{% url 'student_attempted_exams' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_attempted_exams' %}active{% endif %}">
+            <i class="fas fa-check-circle"></i> Attempted
+        </a>
+        <a href="{% url 'student_pyqs' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_pyqs' %}active{% endif %}">
+            <i class="fas fa-history"></i> Previous Papers
+        </a>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">MY RESULTS</div>
+        <a href="{% url 'student_results' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_results' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i> Test Results
+        </a>
+        <a href="{% url 'students:analytics' %}" class="sidebar-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+            <i class="fas fa-chart-area"></i> Performance Analytics
+        </a>
+        <a href="{% url 'download_cumulative_report' %}" class="sidebar-link {% if request.resolver_match.url_name == 'download_cumulative_report' %}active{% endif %}">
+            <i class="fas fa-download"></i> Cumulative Report
+        </a>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">RESOURCES</div>
+        <a href="{% url 'student_materials' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_materials' %}active{% endif %}">
+            <i class="fas fa-book"></i> Study Materials
+        </a>
+        <a href="{% url 'view_leaderboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'view_leaderboard' %}active{% endif %}">
+            <i class="fas fa-trophy"></i> Leaderboard
+        </a>
+        <a href="{% url 'view_certificates' %}" class="sidebar-link {% if request.resolver_match.url_name == 'view_certificates' %}active{% endif %}">
+            <i class="fas fa-certificate"></i> Certificates
+        </a>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">SUPPORT</div>
+        <a href="{% url 'students:help' %}" class="sidebar-link {% if request.resolver_match.url_name == 'help' %}active{% endif %}">
+            <i class="fas fa-life-ring"></i> Help & Support
+        </a>
+    </div>
+{% endblock %}

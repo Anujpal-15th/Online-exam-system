@@ -1,0 +1,206 @@
+{% extends 'dashboards/student_base.html' %}
+{% load static %}
+{% block title %}Take Test - {{ test.title }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="page-header">
+    <h1><i class="fas fa-pen-to-square"></i> {{ test.title }}</h1>
+    {% if not window_closed and not attempt_limit and not no_questions %}
+    <div id="countdown" style="font-size: 1.5rem; color: #667eea; font-weight: 600;"></div>
+    {% endif %}
+</div>
+
+<div class="custom-card">
+    {% if window_closed %}
+      <div style="background: #fff3cd; color: #856404; padding: 20px; border-radius: 10px; text-align: center;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+        {% if window_not_started %}
+        <h3>This test hasn't started yet.</h3>
+        <p>The test is scheduled to start on {{ test.start_at|date:"M d, Y h:i A" }}</p>
+        {% elif window_ended %}
+        <h3>This test has ended.</h3>
+        <p>The test ended on {{ test.end_at|date:"M d, Y h:i A" }}</p>
+        {% else %}
+        <h3>This test isn't currently open.</h3>
+        <p>Please check the availability window.</p>
+        {% endif %}
+        <a href="{% url 'available_tests' %}" class="btn btn-primary" style="margin-top: 15px;">
+          Back to Available Tests
+        </a>
+      </div>
+    {% elif attempt_limit %}
+      <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px; text-align: center;">
+        <i class="fas fa-ban" style="font-size: 3rem; margin-bottom: 15px;"></i>
+        <h3>Maximum Attempts Reached</h3>
+        <p>You have reached the maximum number of attempts allowed for this test.</p>
+        <a href="{% url 'available_tests' %}" style="display: inline-block; margin-top: 15px; background: #667eea; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">
+          Back to Available Tests
+        </a>
+      </div>
+    {% elif no_questions %}
+      <div style="background: #fff3cd; color: #856404; padding: 20px; border-radius: 10px; text-align: center;">
+        <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+        <h3>No Questions Available</h3>
+        <p>{{ error_message|default:'This test has no questions yet. Please contact your teacher.' }}</p>
+        <a href="{% url 'available_tests' %}" style="display: inline-block; margin-top: 15px; background: #667eea; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">
+          Back to Available Tests
+        </a>
+      </div>
+    {% else %}
+    <form method="post" action="{% url 'submit_test' attempt.id %}" id="testForm">
+      {% csrf_token %}
+      {% if ordered_questions %}
+        <ol class="list-group list-group-numbered mb-3">
+          {% for q, pts in ordered_questions %}
+            <li class="list-group-item">
+              <div class="fw-semibold">{{ q.question_text }}</div>
+              <div class="text-muted small mb-2">Points: {{ pts }}</div>
+              <input type="hidden" name="time_{{ q.id }}" id="time_{{ q.id }}" value="0" />
+
+              {% if q.type == 'mcq_single' %}
+                {% for opt in q.options.all %}
+                  <div class="form-check">
+                    <input data-qid="{{ q.id }}" class="form-check-input tracked" type="radio" name="answer_{{ q.id }}" id="opt_{{ q.id }}_{{ forloop.counter }}" value="{{ opt.id }}">
+                    <label class="form-check-label" for="opt_{{ q.id }}_{{ forloop.counter }}">{{ opt.text }}</label>
+                  </div>
+                {% endfor %}
+              {% elif q.type == 'mcq_multi' %}
+                {% for opt in q.options.all %}
+                  <div class="form-check">
+                    <input data-qid="{{ q.id }}" class="form-check-input tracked" type="checkbox" name="answer_{{ q.id }}" id="opt_{{ q.id }}_{{ forloop.counter }}" value="{{ opt.id }}">
+                    <label class="form-check-label" for="opt_{{ q.id }}_{{ forloop.counter }}">{{ opt.text }}</label>
+                  </div>
+                {% endfor %}
+              {% elif q.type == 'true_false' %}
+                <div class="form-check">
+                  <input data-qid="{{ q.id }}" class="form-check-input tracked" type="radio" name="answer_{{ q.id }}" id="tf_true_{{ q.id }}" value="true">
+                  <label class="form-check-label" for="tf_true_{{ q.id }}">True</label>
+                </div>
+                <div class="form-check">
+                  <input data-qid="{{ q.id }}" class="form-check-input tracked" type="radio" name="answer_{{ q.id }}" id="tf_false_{{ q.id }}" value="false">
+                  <label class="form-check-label" for="tf_false_{{ q.id }}">False</label>
+                </div>
+              {% elif q.type == 'fill_in' %}
+                <input data-qid="{{ q.id }}" class="form-control tracked" type="text" name="answer_{{ q.id }}" placeholder="Your answer" />
+              {% elif q.type == 'matching' %}
+                {% with data=q.answer_key.pairs %}
+                  {% if data %}
+                    {% for left,right in data.items %}
+                      <div class="row g-2 align-items-center mb-2">
+                        <div class="col-auto"><strong>{{ left }}</strong></div>
+                        <div class="col-auto">→</div>
+                        <div class="col">
+                          <input type="hidden" name="answer_{{ q.id }}__key__{{ forloop.counter0 }}" value="{{ left }}" />
+                          <select data-qid="{{ q.id }}" class="form-select tracked matching-select" name="answer_{{ q.id }}__{{ forloop.counter0 }}">
+                            {% for r in data.values %}
+                              <option value="{{ r }}">{{ r }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="alert alert-warning mb-0">Matching data not configured.</div>
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                <textarea data-qid="{{ q.id }}" class="form-control tracked" name="answer_{{ q.id }}" rows="3" placeholder="Type your answer here..."></textarea>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <div class="alert alert-info">No questions found for this test.</div>
+      {% endif %}
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-success">Submit Now</button>
+        <a class="btn btn-outline-secondary" href="{% url 'available_tests' %}">Cancel</a>
+      </div>
+    </form>
+  {% endif %}
+</div>
+
+<a href="{% url 'student_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+
+{% if not window_closed and not attempt_limit and not no_questions %}
+<script>
+  (function() {
+    // Read remaining seconds from a data attribute to keep static analyzers happy
+    var remainHolder = document.createElement('span');
+    remainHolder.setAttribute('data-remaining', '{{ remaining_seconds|default:0 }}');
+    const total = parseInt(remainHolder.getAttribute('data-remaining') || '0', 10);
+    const el = document.getElementById('countdown');
+    let secs = total;
+    function fmt(n) { return n < 10 ? '0' + n : '' + n; }
+    function tick() {
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      if (el) el.textContent = fmt(m) + ':' + fmt(s);
+      if (secs <= 0) {
+        // Auto-submit when time is up
+        const form = document.getElementById('testForm');
+        if (form) form.submit();
+        return;
+      }
+      secs -= 1;
+      setTimeout(tick, 1000);
+    }
+    tick();
+    // Track per-question time by focus/blur and ticking
+    const times = {}; // qid -> seconds
+    let currentQ = null;
+    let lastTick = Date.now();
+    function accrue() {
+      const now = Date.now();
+      const delta = Math.floor((now - lastTick) / 1000);
+      if (delta > 0 && currentQ) {
+        times[currentQ] = (times[currentQ] || 0) + delta;
+        lastTick = now;
+      } else if (delta > 0) {
+        lastTick = now;
+      }
+    }
+    setInterval(accrue, 1000);
+
+    function setActiveFrom(el) {
+      const qid = el && el.getAttribute('data-qid');
+      if (!qid) return;
+      accrue();
+      currentQ = qid;
+    }
+    document.querySelectorAll('.tracked').forEach(el => {
+      el.addEventListener('focus', () => setActiveFrom(el));
+      el.addEventListener('click', () => setActiveFrom(el));
+      el.addEventListener('blur', () => accrue());
+    });
+
+    // On submit, write times into hidden inputs
+    const form = document.getElementById('testForm');
+    if (form) {
+      form.addEventListener('submit', () => {
+        accrue();
+        Object.keys(times).forEach(qid => {
+          const input = document.getElementById('time_' + qid);
+          if (input) input.value = String(times[qid]);
+        });
+      });
+    }
+
+    // Randomize matching select options
+    function shuffleOptions(sel) {
+      const arr = Array.from(sel.options);
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      sel.innerHTML = '';
+      arr.forEach(o => sel.appendChild(o));
+    }
+    document.querySelectorAll('select.matching-select').forEach(shuffleOptions);
+  })();
+</script>
+{% endif %}
+{% endblock %}

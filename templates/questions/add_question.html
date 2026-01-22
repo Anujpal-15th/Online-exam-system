@@ -1,353 +1,368 @@
-{% extends 'base.html' %}
-{% block title %}Add Question{% endblock %}
+{% extends base_template|default:'dashboards/teacher_base.html' %}
 {% load static %}
-{% block extra_head %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-{% endblock %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+{% block title %}Create New Question{% endblock %}
 
 {% block content %}
-<style>
-/* Global Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<div class="page-header">
+    <h1><i class="fas fa-plus-circle"></i> Add New Question</h1>
+</div>
 
-/* Body */
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa;
-}
-
-/* Layout Container */
-.dashboard-container {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* Sidebar */
-.dashboard-sidebar {
-    width: 220px;
-    background: #007bff;
-    color: white;
-    padding: 20px;
-    flex-shrink: 0;
-    height: 100vh;
-    position: fixed;
-    top: 60px;
-    left: 0;
-    overflow-y: auto;
-}
-
-.dashboard-sidebar h2 {
-    margin-bottom: 1rem;
-    margin-top: 10px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid rgba(255,255,255,0.3);
-}
-
-.dashboard-sidebar a {
-    display: block;
-    color: white;
-    padding: 10px 0;
-    text-decoration: none;
-    font-weight: 500;
-    border-radius: 5px;
-    transition: background 0.2s;
-}
-
-.dashboard-sidebar a:hover {
-    background: rgba(255,255,255,0.2);
-}
-
-/* Main Section */
-.dashboard-main {
-    margin-left: 220px;
-    flex-grow: 1;
-    padding: 40px 20px;
-    width: calc(100% - 220px);
-}
-
-/* Page Title */
-.dashboard-main h2 {
-    border-bottom: 3px solid #007bff;
-    padding-bottom: 8px;
-    margin-bottom: 20px;
-    color: #007bff;
-}
-
-/* Form Styling */
-.question-form {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 25px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.option-group {
-    margin-bottom: 15px;
-}
-
-.matching-pair {
-    margin-bottom: 10px;
-}
-
-.nav-tabs .nav-link {
-    color: #495057;
-    cursor: pointer;
-}
-
-.nav-tabs .nav-link.active {
-    font-weight: bold;
-}
-
-.tab-content {
-    padding-top: 20px;
-}
-
-/* Custom Nav Tabs Styling */
-.nav-tabs {
-    border-bottom: none;
-    display: flex;
-    justify-content: left;
-    margin-bottom: 25px;
-    gap: 10px;
-}
-
-.nav-tabs .nav-item {
-    margin: 0;
-}
-
-.nav-tabs .nav-link {
-    background-color: #007bff; /* Same blue color for all tabs */
-    color: #fff; /* White text */
-    border: 2px solid #007bff;
-    border-radius: 12px;
-    padding: 10px 25px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.nav-tabs .nav-link:hover {
-    background-color: #006ae6; /* Slightly darker on hover */
-    transform: translateY(-2px);
-    box-shadow: 0 3px 6px rgba(0, 123, 255, 0.4);
-}
-
-.nav-tabs .nav-link.active {
-    background-color: #006ae6; /* Same tone when active */
-    color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.5);
-}
-
-</style>
-
-<div class="dashboard-container">
-
-    <!-- Sidebar -->
-    <div class="dashboard-sidebar">
-        <h2>Teacher Panel</h2>
-        <a href="{% url 'teacher_dashboard' %}">Dashboard</a>
-        <a href="{% url 'questions_list' %}">Manage Questions</a>
-        <a href="{% url 'add_question' %}">Add Question</a>
-        <a href="{% url 'submissions_list' %}">All Submissions</a>
-        <a href="{% url 'teacher_reports' %}">Performance Reports</a>
+<div class="custom-card">
+    <div class="question-tabs">
+        <button class="tab-btn active" onclick="switchTab('manual')">
+            <i class="fas fa-edit"></i> Create Manually
+        </button>
+        <button class="tab-btn" onclick="switchTab('upload')">
+            <i class="fas fa-upload"></i> Upload File
+        </button>
     </div>
 
-    <!-- Main Section -->
-    <div class="dashboard-main">
-        <h2>Add Question</h2>
-        <div class="container-fluid">
-            <!-- Tabs -->
-            <ul class="nav nav-tabs mb-4" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#manualInput">Create Question</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#fileUpload">Upload File</a>
-                </li>
-            </ul>
+    <!-- File Upload Tab -->
+    <div id="uploadTab" class="tab-content-pane">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-file-upload"></i> Upload Question File
+                </label>
+                <input type="file" class="form-input" name="question_file" accept=".json,.csv,.txt,.pdf">
+                <small class="form-hint">
+                    <i class="fas fa-info-circle"></i> Supported: JSON (array of questions), CSV, TXT with JSON content, or PDF
+                </small>
+            </div>
 
-            <div class="tab-content">
-                <!-- File Upload -->
-                <div id="fileUpload" class="tab-pane fade">
-                    <form method="POST" enctype="multipart/form-data" class="question-form">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Upload Question File</label>
-                            <input type="file" class="form-control" name="question_file" accept=".pdf,.doc,.docx,.txt">
-                            <small class="text-muted">Supported formats: PDF, Word, Text</small>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">File Type</label>
-                            <select class="form-control" name="file_type">
-                                <option value="structured">Structured Question Paper</option>
-                                <option value="unstructured">Unstructured Text</option>
-                            </select>
-                        </div>
-                        <button type="submit" name="upload_file" class="btn btn-primary">Upload and Process</button>
-                    </form>
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-cog"></i> File Type
+                </label>
+                <select class="form-select" name="file_type">
+                    <option value="structured">Structured (JSON/CSV)</option>
+                    <option value="unstructured">Unstructured (ignored)</option>
+                </select>
+                <small class="form-hint">
+                    CSV columns: type, question_text, options (pipe-separated), correct, subject, topic, difficulty
+                </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-cloud-upload-alt"></i> Upload and Process
+            </button>
+        </form>
+    </div>
+
+    <!-- Manual Question Creation -->
+    <div id="manualTab" class="tab-content-pane active">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-list-alt"></i> Question Type <span class="required">*</span>
+                </label>
+                <select name="question_type" id="questionType" class="form-select" onchange="toggleAnswerFields()" required>
+                    <option value="">Select Type</option>
+                    <option value="multiple_choice">Multiple Choice</option>
+                    <option value="true_false">True/False</option>
+                    <option value="short_answer">Short Answer</option>
+                    <option value="essay">Essay</option>
+                    <option value="fill_blanks">Fill in the Blanks</option>
+                    <option value="matching">Matching</option>
+                    <option value="numerical">Numerical</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-question-circle"></i> Question Text <span class="required">*</span>
+                </label>
+                <textarea name="question_text" class="form-textarea" rows="5" placeholder="Enter the question here..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-star"></i> Marks <span class="required">*</span>
+                </label>
+                <input type="number" name="marks" class="form-input" min="1" placeholder="Enter marks for this question" required>
+                <small class="form-hint">
+                    <i class="fas fa-info-circle"></i> Assign points/marks for this question
+                </small>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-book"></i> Subject
+                    </label>
+                    <select name="subject" id="add-question-subject-selector" class="form-select">
+                        <option value="">-- Loading subjects... --</option>
+                    </select>
+                    <small class="form-hint">
+                        <i class="fas fa-info-circle"></i> Select a subject or add a new one from the dropdown
+                    </small>
                 </div>
-
-                <!-- Manual Input -->
-                <div id="manualInput" class="tab-pane fade show active">
-                    <form method="POST" class="question-form" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="form-group mb-3">
-                            <label for="questionType">Question Type:</label>
-                            <select name="question_type" id="questionType" class="form-control" onchange="toggleAnswerFields()" required>
-                                <option value="">Select Question Type</option>
-                                <option value="multiple_choice">Multiple Choice</option>
-                                <option value="true_false">True/False</option>
-                                <option value="short_answer">Short Answer</option>
-                                <option value="essay">Essay</option>
-                                <option value="fill_blanks">Fill in the Blanks</option>
-                                <option value="matching">Matching</option>
-                                <option value="numerical">Numerical</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label for="questionText">Question Text:</label>
-                            <textarea name="question_text" id="questionText" class="form-control" rows="5" required></textarea>
-                        </div>
-
-                        <!-- Dynamic Sections -->
-                        <div id="multipleChoiceOptions" style="display: none;" class="mb-3">
-                            <label>Options:</label>
-                            <div class="option-group">
-                                {% for i in "1234" %}
-                                <div class="input-group mb-2">
-                                    <input type="text" name="option{{ i }}" class="form-control" placeholder="Option {{ i }}">
-                                    <input type="file" name="option{{ i }}_image" class="form-control" accept="image/*">
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <label>Correct Answer:</label>
-                            <select name="correct_answer" class="form-control">
-                                <option value="1">Option 1</option>
-                                <option value="2">Option 2</option>
-                                <option value="3">Option 3</option>
-                                <option value="4">Option 4</option>
-                            </select>
-                        </div>
-
-                        <div id="trueFalseOptions" style="display:none;" class="mb-3">
-                            <label>Correct Answer:</label>
-                            <select name="tf_answer" class="form-control">
-                                <option value="true">True</option>
-                                <option value="false">False</option>
-                            </select>
-                        </div>
-
-                        <div id="fillBlanksOptions" style="display:none;" class="mb-3">
-                            <label>Correct Answer(s):</label>
-                            <input type="text" name="blank_answer" class="form-control" placeholder="Enter the correct answer">
-                            <small class="text-muted">Separate multiple answers with semicolons (;)</small>
-                        </div>
-
-                        <div id="matchingOptions" style="display:none;" class="mb-3">
-                            <div id="matchingPairs">
-                                <div class="matching-pair input-group mb-2">
-                                    <input type="text" name="match_left[]" class="form-control" placeholder="Left item">
-                                    <input type="text" name="match_right[]" class="form-control" placeholder="Right item">
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="addMatchingPair()">Add More Pairs</button>
-                        </div>
-
-                        <div id="numericalOptions" style="display:none;" class="mb-3">
-                            <label>Correct Answer:</label>
-                            <input type="number" name="numerical_answer" class="form-control" step="any">
-                            <label>Acceptable Error Margin (±):</label>
-                            <input type="number" name="error_margin" class="form-control" step="any" placeholder="e.g., 0.1">
-                        </div>
-
-                        <div id="shortAnswerOptions" style="display:none;" class="mb-3">
-                            <label>Model Answer:</label>
-                            <textarea name="short_answer" class="form-control" rows="3"></textarea>
-                        </div>
-
-                        <div id="essayOptions" style="display:none;" class="mb-3">
-                            <label>Grading Rubric:</label>
-                            <textarea name="essay_rubric" class="form-control" rows="3" placeholder="Enter grading criteria"></textarea>
-                            <label>Word Limit:</label>
-                            <input type="number" name="word_limit" class="form-control" placeholder="Maximum word count">
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <input type="text" name="subject" class="form-control" placeholder="Subject" required>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" name="topic" class="form-control" placeholder="Topic" required>
-                            </div>
-                            <div class="col-md-4">
-                                <select name="difficulty" class="form-control" required>
-                                    <option value="">Select Difficulty</option>
-                                    <option value="easy">Easy</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="hard">Hard</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Add Question</button>
-                            <a href="{% url 'questions_list' %}" class="btn btn-secondary ml-2">Cancel</a>
-                        </div>
-                    </form>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-bookmark"></i> Topic
+                    </label>
+                    <input type="text" name="topic" class="form-input" placeholder="e.g., Arrays, Trees, Sorting">
                 </div>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-paperclip"></i> Supporting File (Optional)
+                </label>
+                <input type="file" name="supporting_file" class="form-input" accept=".jpg,.png,.pdf,.docx,.txt">
+                <small class="form-hint">
+                    Upload images, PDFs, or documents to accompany the question
+                </small>
+            </div>
+
+            <!-- Multiple Choice Options -->
+            <div id="multipleChoiceOptions" class="dynamic-section">
+                <label class="form-label">
+                    <i class="fas fa-check-square"></i> Options
+                </label>
+                <div class="option-group">
+                    {% for i in "1234" %}
+                    <div class="option-item">
+                        <span>{{ i }}.</span>
+                        <input type="text" name="option{{ i }}" placeholder="Option {{ i }}">
+                        <input type="file" name="option{{ i }}_image" accept="image/*">
+                    </div>
+                    {% endfor %}
+                </div>
+                <label class="form-label form-group-mt">
+                    Correct Answer
+                </label>
+                <select name="correct_answer" class="form-select">
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                    <option value="4">Option 4</option>
+                </select>
+            </div>
+
+            <!-- True/False Options -->
+            <div id="trueFalseOptions" class="dynamic-section">
+                <label class="form-label">
+                    Correct Answer
+                </label>
+                <select name="tf_answer" class="form-select">
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                </select>
+            </div>
+
+            <!-- Fill in the Blanks Options -->
+            <div id="fillBlanksOptions" class="dynamic-section">
+                <label class="form-label">
+                    Correct Answer(s)
+                </label>
+                <input type="text" name="blank_answer" class="form-input" placeholder="Separate multiple answers with semicolon (;)">
+                <small class="form-hint">
+                    Example: answer1; answer2; answer3
+                </small>
+            </div>
+
+            <!-- Matching Options -->
+            <div id="matchingOptions" class="dynamic-section">
+                <label class="form-label">
+                    Matching Pairs
+                </label>
+                <div id="matchingPairs">
+                    <div class="matching-pair-row">
+                        <input type="text" name="match_left[]" class="form-input" placeholder="Left item">
+                        <input type="text" name="match_right[]" class="form-input" placeholder="Right item">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-primary" onclick="addMatchingPair()">
+                    <i class="fas fa-plus"></i> Add More Pairs
+                </button>
+            </div>
+
+            <!-- Numerical Options -->
+            <div id="numericalOptions" class="dynamic-section">
+                <label class="form-label">
+                    Correct Answer
+                </label>
+                <input type="number" name="numerical_answer" class="form-input" step="any" placeholder="Enter numerical answer">
+                <label class="form-label form-group-mt">
+                    Acceptable Error Margin (±)
+                </label>
+                <input type="number" name="error_margin" class="form-input" step="any" placeholder="e.g., 0.1">
+            </div>
+
+            <!-- Short Answer Options -->
+            <div id="shortAnswerOptions" class="dynamic-section">
+                <label class="form-label">
+                    Model Answer
+                </label>
+                <textarea name="short_answer" class="form-textarea" rows="3" placeholder="Enter the expected answer or key points"></textarea>
+            </div>
+
+            <!-- Essay Options -->
+            <div id="essayOptions" class="dynamic-section">
+                <label class="form-label">
+                    Grading Rubric
+                </label>
+                <textarea name="essay_rubric" class="form-textarea" rows="3" placeholder="Enter grading criteria and key points"></textarea>
+                <label class="form-label form-group-mt">
+                    Word Limit
+                </label>
+                <input type="number" name="word_limit" class="form-input" placeholder="Maximum word count">
+            </div>
+
+            <!-- Difficulty -->
+            <div class="form-group form-group-mt">
+                <label class="form-label">
+                    <i class="fas fa-signal"></i> Difficulty Level <span class="required">*</span>
+                </label>
+                <select name="difficulty" class="form-select" required>
+                    <option value="">Select Difficulty</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+            
+            <!-- Folders -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-folder"></i> Organize in Folders
+                </label>
+                <select name="folders" class="form-select" id="folder-selector" multiple style="height: 120px;">
+                    <option value="">Loading folders...</option>
+                </select>
+                <small class="form-hint">
+                    <i class="fas fa-info-circle"></i> Hold Ctrl/Cmd to select multiple folders
+                </small>
+            </div>
+
+            <!-- Marks -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check-circle"></i> Submit Question
+                </button>
+                <a href="{% url 'questions_list' %}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
-{% block extra_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-function toggleAnswerFields() {
-    const questionType = document.getElementById('questionType').value;
-    const allOptions = [
-        'multipleChoiceOptions',
-        'trueFalseOptions',
-        'fillBlanksOptions',
-        'matchingOptions',
-        'numericalOptions',
-        'shortAnswerOptions',
-        'essayOptions'
-    ];
+{% if user.user_type == 1 %}
+<a href="{% url 'admin_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+{% else %}
+<a href="{% url 'teacher_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+{% endif %}
 
-    allOptions.forEach(option => {
-        document.getElementById(option).style.display = 'none';
+<script>
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content-pane').forEach(pane => pane.classList.remove('active'));
+    
+    if (tab === 'manual') {
+        document.querySelector('[onclick="switchTab(\'manual\')"]').classList.add('active');
+        document.getElementById('manualTab').classList.add('active');
+    } else {
+        document.querySelector('[onclick="switchTab(\'upload\')"]').classList.add('active');
+        document.getElementById('uploadTab').classList.add('active');
+    }
+}
+
+function toggleAnswerFields() {
+    const type = document.getElementById('questionType').value;
+    const sections = ['multipleChoiceOptions','trueFalseOptions','fillBlanksOptions','matchingOptions','numericalOptions','shortAnswerOptions','essayOptions'];
+
+    sections.forEach(id => {
+        const elem = document.getElementById(id);
+        if (elem) elem.classList.remove('active');
     });
 
-    switch(questionType) {
-        case 'multiple_choice': document.getElementById('multipleChoiceOptions').style.display = 'block'; break;
-        case 'true_false': document.getElementById('trueFalseOptions').style.display = 'block'; break;
-        case 'fill_blanks': document.getElementById('fillBlanksOptions').style.display = 'block'; break;
-        case 'matching': document.getElementById('matchingOptions').style.display = 'block'; break;
-        case 'numerical': document.getElementById('numericalOptions').style.display = 'block'; break;
-        case 'short_answer': document.getElementById('shortAnswerOptions').style.display = 'block'; break;
-        case 'essay': document.getElementById('essayOptions').style.display = 'block'; break;
+    if (!type) return;
+
+    const sectionMap = {
+        'multiple_choice': 'multipleChoiceOptions',
+        'true_false': 'trueFalseOptions',
+        'fill_blanks': 'fillBlanksOptions',
+        'matching': 'matchingOptions',
+        'numerical': 'numericalOptions',
+        'short_answer': 'shortAnswerOptions',
+        'essay': 'essayOptions'
+    };
+
+    const selectedId = sectionMap[type];
+    if (selectedId) {
+        const elem = document.getElementById(selectedId);
+        if (elem) elem.classList.add('active');
     }
 }
 
 function addMatchingPair() {
-    const matchingPairs = document.getElementById('matchingPairs');
-    const newPair = document.createElement('div');
-    newPair.className = 'matching-pair input-group mb-2';
-    newPair.innerHTML = `
-        <input type="text" name="match_left[]" class="form-control" placeholder="Left item">
-        <input type="text" name="match_right[]" class="form-control" placeholder="Right item">
-        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>
+    const container = document.getElementById('matchingPairs');
+    if (!container) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'matching-pair-row';
+    wrapper.innerHTML = `
+        <input type="text" name="match_left[]" class="form-input" placeholder="Left item">
+        <input type="text" name="match_right[]" class="form-input" placeholder="Right item">
     `;
-    matchingPairs.appendChild(newPair);
+    container.appendChild(wrapper);
 }
+
+// Load folders for the folder selector
+function loadFolders() {
+    const select = document.getElementById('folder-selector');
+    if (!select) {
+        console.error('Folder selector not found');
+        return;
+    }
+    
+    fetch('/questions/api/folders/')
+        .then(response => response.json())
+        .then(data => {
+            select.innerHTML = '';
+            
+            if (!data.folders || data.folders.length === 0) {
+                select.innerHTML = '<option value="">No folders available - Create one first</option>';
+                return;
+            }
+            
+            function addOptions(folders, prefix = '') {
+                folders.forEach(folder => {
+                    const option = document.createElement('option');
+                    option.value = folder.id;
+                    option.textContent = prefix + folder.name;
+                    select.appendChild(option);
+                    
+                    if (folder.subfolders && folder.subfolders.length > 0) {
+                        addOptions(folder.subfolders, prefix + '  └─ ');
+                    }
+                });
+            }
+            
+            addOptions(data.folders);
+        })
+        .catch(error => {
+            console.error('Error loading folders:', error);
+            select.innerHTML = '<option value="">Error loading folders</option>';
+        });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    toggleAnswerFields();
+    // Initialize subject selector
+    new SubjectSelector('add-question-subject-selector');
+    // Load folders
+    loadFolders();
+});
 </script>
-{% endblock %}
+<script src="{% static 'js/subject-selector.js' %}"></script>
 {% endblock %}

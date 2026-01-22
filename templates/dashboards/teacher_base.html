@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block portal_title %}Teacher Portal{% endblock %}
+
+{% block sidebar %}
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">DASHBOARD</div>
+        <a href="{% url 'teacher_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'teacher_dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i> Overview
+        </a>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">QUESTIONS</div>
+        <a href="{% url 'questions_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'questions_list' %}active{% endif %}">
+            <i class="fas fa-list"></i> Question Bank
+        </a>
+        <a href="{% url 'add_question' %}" class="sidebar-link {% if request.resolver_match.url_name == 'add_question' %}active{% endif %}">
+            <i class="fas fa-plus-circle"></i> Add Question
+        </a>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">TESTS</div>
+        <a href="{% url 'tests_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'tests_list' %}active{% endif %}">
+            <i class="fas fa-file-alt"></i> All Tests
+        </a>
+        <a href="{% url 'add_test' %}" class="sidebar-link {% if request.resolver_match.url_name == 'add_test' %}active{% endif %}">
+            <i class="fas fa-plus-square"></i> Create Test
+        </a>
+        <a href="{% url 'paper_builder' %}" class="sidebar-link {% if request.resolver_match.url_name == 'paper_builder' %}active{% endif %}">
+            <i class="fas fa-tools"></i> Paper Builder
+        </a>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">GRADING</div>
+        <a href="{% url 'submissions_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'submissions_list' %}active{% endif %}">
+            <i class="fas fa-clipboard-check"></i> Submissions
+        </a>
+    </div>
+    
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">RESOURCES</div>
+        <a href="{% url 'teacher_materials' %}" class="sidebar-link {% if request.resolver_match.url_name == 'teacher_materials' %}active{% endif %}">
+            <i class="fas fa-folder-open"></i> Materials
+        </a>
+        <a href="{% url 'teacher_reports' %}" class="sidebar-link {% if request.resolver_match.url_name == 'teacher_reports' %}active{% endif %}">
+            <i class="fas fa-chart-bar"></i> Performance Reports
+        </a>
+    </div>
+{% endblock %}

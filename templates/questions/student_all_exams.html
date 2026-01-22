@@ -1,0 +1,45 @@
+{% extends 'dashboards/student_base.html' %}
+{% block title %}All Exams{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-list"></i> All Available Exams</h1>
+    <p>
+        <i class="fas fa-file-alt"></i> Available Tests: <strong>{{ tests.count }}</strong>
+    </p>
+</div>
+    
+{% if tests %}
+<div class="card-grid">
+    {% for test in tests %}
+    <div class="custom-card card-hover">
+        <h3 class="mb-3">{{ test.title }}</h3>
+        <div class="mb-4">
+            <p><i class="fas fa-book"></i> <strong>Subject:</strong> {{ test.subject|default:"General" }}</p>
+            <p><i class="fas fa-question-circle"></i> <strong>Questions:</strong> {{ test.questions.count }}</p>
+            <p><i class="fas fa-clock"></i> <strong>Duration:</strong> {{ test.duration_minutes }} minutes</p>
+            <p><i class="fas fa-redo"></i> <strong>Max Attempts:</strong> {{ test.max_attempts }}</p>
+            <p><i class="fas fa-check-circle"></i> <strong>Your Attempts:</strong> {{ test.attempt_count|default:0 }}</p>
+            
+            {% if test.start_at %}
+            <p><i class="fas fa-calendar"></i> <strong>Starts:</strong> {{ test.start_at|date:"M d, Y h:i A" }}</p>
+            {% endif %}
+        </div>
+            
+        <a href="{% url 'start_test' test.id %}" class="btn btn-primary">
+            <i class="fas fa-play"></i> Start Test
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-inbox fa-4x"></i>
+    <p>No exams available at the moment.</p>
+</div>
+{% endif %}
+
+<a href="{% url 'student_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'dashboards/teacher_base.html' %}
+{% block title %}Grade Attempt - {{ attempt.test.title }}{% endblock %}
+{% block content %}
+<div class="container">
+  <h2 class="mb-3">Grade Attempt for {{ attempt.student.username }} — {{ attempt.test.title }}</h2>
+  <div class="mb-3 d-flex gap-2">
+    <a class="btn btn-secondary" href="{% url 'attempts_list' attempt.test.id %}">Back to Attempts</a>
+    <a class="btn btn-outline-primary" href="{% url 'review_test' attempt.id %}">View as Student</a>
+  </div>
+
+  {% if rows %}
+    <form method="post">
+      {% csrf_token %}
+      <ol class="list-group list-group-numbered mb-3">
+        {% for item in rows %}
+          <li class="list-group-item">
+            <div class="fw-semibold">{{ item.question.question_text }}</div>
+            {% if item.question.rubric_text %}
+              <div class="small text-muted mb-2">Rubric: {{ item.question.rubric_text }}</div>
+            {% endif %}
+            <div class="mb-2">
+              <span class="fw-semibold">Student Answer:</span>
+              {% if item.answer and item.answer.answer_text %}
+                <div class="mt-1">{{ item.answer.answer_text|linebreaksbr }}</div>
+              {% else %}
+                <div class="text-muted">No answer provided.</div>
+              {% endif %}
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <label class="form-label mb-0" for="score_{{ item.question.id }}">Score</label>
+              <input class="form-control" style="max-width: 120px;" type="number" name="score_{{ item.question.id }}" id="score_{{ item.question.id }}" min="0" max="{{ item.points }}" value="{% if item.answer and item.answer.score != None %}{{ item.answer.score }}{% else %}0{% endif %}">
+              <span class="text-muted">/ {{ item.points }}</span>
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+      <button type="submit" class="btn btn-primary">Save Grades</button>
+    </form>
+  {% else %}
+    <div class="alert alert-info">No subjective answers in this attempt.</div>
+  {% endif %}
+</div>
+{% endblock %}

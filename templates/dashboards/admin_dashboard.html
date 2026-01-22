@@ -1,14 +1,229 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'dashboards/admin_base.html' %}
 {% block title %}Admin Dashboard{% endblock %}
-{% block content %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
-<h2>Admin Dashboard</h2>
-{% comment %} <ul>
-    <li><a href="{% url 'questions_list' %}">Manage Questions</a></li>
-    <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
-    <li><a href="{% url 'admin_activity' %}">Activity & Reports</a></li>
-    <li><a href="{% url 'logout' %}">Logout</a></li>
-</ul> {% endcomment %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div>
+      <div class="stat-value">{{ users_count }}</div>
+      <div class="stat-title">Total Users</div>
+    </div>
+    <i class="fas fa-users" style="color: #667eea;"></i>
+  </div>
+  <div class="stat-card">
+    <div>
+      <div class="stat-value">{{ questions_count }}</div>
+      <div class="stat-title">Total Questions</div>
+    </div>
+    <i class="fas fa-question-circle" style="color: #1cc88a;"></i>
+  </div>
+  <div class="stat-card">
+    <div>
+      <div class="stat-value">{{ tests_count }}</div>
+      <div class="stat-title">Total Tests</div>
+    </div>
+    <i class="fas fa-file-alt" style="color: #f6c23e;"></i>
+  </div>
+  <div class="stat-card">
+    <div>
+      <div class="stat-value">{{ submissions_count }}</div>
+      <div class="stat-title">Total Submissions</div>
+    </div>
+    <i class="fas fa-clipboard-check" style="color: #e74a3b;"></i>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="custom-card">
+  <h3 style="color: #667eea; margin-bottom: 20px;"><i class="fas fa-bolt"></i> Quick Actions</h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+    <a href="{% url 'admin_create_user' %}" class="btn btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px;">
+      <i class="fas fa-user-plus"></i> Create New User
+    </a>
+    <a href="{% url 'add_question' %}" class="btn btn-success" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px;">
+      <i class="fas fa-plus-circle"></i> Add Question
+    </a>
+    <a href="{% url 'add_test' %}" class="btn btn-warning" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px;">
+      <i class="fas fa-file-plus"></i> Create Test
+    </a>
+    <a href="{% url 'admin_activity' %}" class="btn btn-info" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px;">
+      <i class="fas fa-chart-line"></i> View Analytics
+    </a>
+  </div>
+</div>
+
+<!-- Recent Activities -->
+<div class="custom-card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h3 style="color: #667eea; margin: 0;"><i class="fas fa-history"></i> Recent Submissions</h3>
+    <a href="{% url 'admin_submissions' %}" class="btn btn-primary">
+      <i class="fas fa-eye"></i> View All
+    </a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th><i class="fas fa-user"></i> Student</th>
+          <th><i class="fas fa-book"></i> Test/Subject</th>
+          <th class="text-center"><i class="fas fa-star"></i> Score</th>
+          <th><i class="fas fa-calendar"></i> Date</th>
+          <th class="text-center"><i class="fas fa-cog"></i> Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in recent_submissions %}
+        <tr>
+          <td><strong>{{ s.student.username }}</strong></td>
+          <td>
+            {% if s.test %}
+              {# Test Attempt #}
+              <strong>{{ s.test.title }}</strong>
+              <br>
+              <small style="color: #999;">Test Attempt #{{ s.attempt_number }}</small>
+            {% elif s.question %}
+              {# Legacy Submission #}
+              {% if s.question.subject %}
+                {{ s.question.subject }}
+              {% else %}
+                Question {{ s.question.id }}
+              {% endif %}
+              <br>
+              <small style="color: #999;">Question Submission</small>
+            {% else %}
+              N/A
+            {% endif %}
+          </td>
+          <td class="text-center">
+            {% if s.test %}
+              {# Test Attempt Score #}
+              {% if s.total_score is not None %}
+                <span class="badge badge-primary">{{ s.total_score }}</span>
+              {% else %}
+                <span class="badge badge-secondary">-</span>
+              {% endif %}
+            {% else %}
+              {# Legacy Submission Score #}
+              {% if s.score is not None %}
+                <span class="badge badge-primary">{{ s.score }}</span>
+              {% else %}
+                <span class="badge badge-secondary">-</span>
+              {% endif %}
+            {% endif %}
+          </td>
+          <td>{{ s.submitted_at|date:"M d, Y H:i" }}</td>
+          <td class="text-center">
+            {% if s.test %}
+              {# Test Attempt Status #}
+              {% if s.is_submitted %}
+                {% if s.total_score is not None %}
+                  <span class="badge badge-success"><i class="fas fa-check"></i> Graded</span>
+                {% else %}
+                  <span class="badge badge-warning"><i class="fas fa-clock"></i> Pending</span>
+                {% endif %}
+              {% else %}
+                <span class="badge badge-info"><i class="fas fa-hourglass-half"></i> In Progress</span>
+              {% endif %}
+            {% else %}
+              {# Legacy Submission Status #}
+              {% if s.graded %}
+                <span class="badge badge-success"><i class="fas fa-check"></i> Graded</span>
+              {% else %}
+                <span class="badge badge-warning"><i class="fas fa-clock"></i> Pending</span>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="table-empty" style="text-align: center; padding: 40px;">
+            <i class="fas fa-inbox" style="font-size: 48px; color: #ccc; margin-bottom: 10px;"></i>
+            <p style="color: #999;">No recent activity.</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Row with Notifications and Help Requests -->
+<div class="row g-3">
+    <!-- Pending Help Requests -->
+    <div class="col-lg-6">
+        <div class="custom-card">
+            <div class="card-header-section">
+                <h3 class="card-section-title"><i class="fas fa-life-ring"></i> Pending Help Requests</h3>
+                <a href="{% url 'admin_help' %}" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if pending_help_requests %}
+                    {% for request in pending_help_requests %}
+                    <div class="alert {% if request.priority == 'urgent' %}alert-danger{% elif request.priority == 'high' %}alert-warning{% else %}alert-info{% endif %} mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1"><strong>{{ request.subject }}</strong></h6>
+                                <p class="mb-1 small">From: <strong>{{ request.student.username }}</strong></p>
+                                <small class="text-muted"><i class="fas fa-clock"></i> {{ request.created_at|timesince }} ago</small>
+                            </div>
+                            <div>
+                                {% if request.priority == 'urgent' %}
+                                    <span class="badge bg-danger">Urgent</span>
+                                {% elif request.priority == 'high' %}
+                                    <span class="badge bg-warning">High</span>
+                                {% else %}
+                                    <span class="badge bg-info">{{ request.priority|title }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No pending help requests.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Notifications -->
+    <div class="col-lg-6">
+        <div class="custom-card">
+            <div class="card-header-section">
+                <h3 class="card-section-title"><i class="fas fa-bell"></i> Recent Notifications</h3>
+                <a href="{% url 'students:notifications' %}" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_notifications %}
+                    {% for notification in recent_notifications %}
+                    <div class="alert alert-info mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1"><strong>{{ notification.title }}</strong></h6>
+                                <p class="mb-1">{{ notification.message }}</p>
+                                <small class="text-muted"><i class="fas fa-clock"></i> {{ notification.created_at|timesince }} ago</small>
+                            </div>
+                            {% if notification.notification_type %}
+                            <span class="badge bg-info">{{ notification.get_notification_type_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>No new notifications.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

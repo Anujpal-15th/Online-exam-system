@@ -1,20 +1,149 @@
-{% extends 'base.html' %}
-{% block title %}Edit Question{% endblock %}
-{% block content %}
-<h2>Edit Question</h2>
-<form method="POST">
-  {% csrf_token %}
-  <textarea name="question_text" rows="5" cols="50" required>{{ question.question_text }}</textarea><br><br>
-  <input type="text" name="subject" placeholder="Subject" value="{{ question.subject }}" />
-  <input type="text" name="topic" placeholder="Topic" value="{{ question.topic }}" style="margin-left:8px;" />
-  <select name="difficulty" style="margin-left:8px;">
-    <option value="easy" {% if question.difficulty == 'easy' %}selected{% endif %}>Easy</option>
-    <option value="medium" {% if question.difficulty == 'medium' %}selected{% endif %}>Medium</option>
-    <option value="hard" {% if question.difficulty == 'hard' %}selected{% endif %}>Hard</option>
-  </select>
-  <br><br>
-  <button type="submit">Update Question</button>
-  <a href="{% url 'questions_list' %}" style="margin-left:8px;">Cancel</a>
-</form>
-{% endblock %}
+{% extends base_template|default:'dashboards/teacher_base.html' %}
 
+{% block title %}Edit Question{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-edit"></i> Edit Question</h1>
+</div>
+
+<div class="custom-card" style="max-width: 900px; margin: 0 auto;">
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group mb-3">
+            <label class="form-label">
+                <i class="fas fa-question-circle"></i> Question Text
+            </label>
+            <textarea name="question_text" class="form-input" rows="5" required>{{ question.question_text }}</textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-book"></i> Subject
+                </label>
+                <select name="subject" id="edit-subject-selector" class="form-select" data-selected="{{ question.subject }}">
+                    <option value="">-- Loading subjects... --</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-bookmark"></i> Topic
+                </label>
+                <input type="text" name="topic" class="form-input" placeholder="e.g., Arrays, Trees, Sorting" value="{{ question.topic }}">
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            <label class="form-label">
+                <i class="fas fa-signal"></i> Difficulty Level
+            </label>
+            <select name="difficulty" class="form-select">
+                <option value="easy" {% if question.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                <option value="medium" {% if question.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                <option value="hard" {% if question.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+            </select>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label class="form-label">
+                <i class="fas fa-folder"></i> Organize in Folders
+            </label>
+            <select name="folders" class="form-select" id="folder-selector" multiple style="height: 120px;">
+                <option value="">Loading folders...</option>
+            </select>
+            <small class="form-hint">
+                <i class="fas fa-info-circle"></i> Hold Ctrl/Cmd to select multiple folders
+            </small>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Update Question
+            </button>
+            {% if user.user_type == 1 %}
+                <a href="{% url 'admin_questions' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            {% else %}
+                <a href="{% url 'questions_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% load static %}
+<script src="{% static 'js/subject-selector.js' %}"></script>
+<script>
+// Load folders and pre-select current question's folders
+function loadFolders() {
+    const select = document.getElementById('folder-selector');
+    if (!select) {
+        console.error('Folder selector not found');
+        return;
+    }
+    
+    fetch('/questions/api/folders/')
+        .then(response => response.json())
+        .then(data => {
+            select.innerHTML = '';
+            
+            if (!data.folders || data.folders.length === 0) {
+                select.innerHTML = '<option value="">No folders available - Create one first</option>';
+                return;
+            }
+            
+            function addOptions(folders, prefix = '') {
+                folders.forEach(folder => {
+                    const option = document.createElement('option');
+                    option.value = folder.id;
+                    option.textContent = prefix + folder.name;
+                    select.appendChild(option);
+                    
+                    if (folder.subfolders && folder.subfolders.length > 0) {
+                        addOptions(folder.subfolders, prefix + '  └─ ');
+                    }
+                });
+            }
+            
+            addOptions(data.folders);
+            
+            // Pre-select current folders
+            const currentFolders = {{ question_folders|safe }};
+            if (currentFolders && currentFolders.length > 0) {
+                setTimeout(() => {
+                    const options = select.options;
+                    for (let i = 0; i < options.length; i++) {
+                        if (currentFolders.some(f => f.id == options[i].value)) {
+                            options[i].selected = true;
+                        }
+                    }
+                }, 100);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading folders:', error);
+            select.innerHTML = '<option value="">Error loading folders</option>';
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const selector = new SubjectSelector('edit-subject-selector');
+    // Pre-select the current subject after loading
+    const currentSubject = document.getElementById('edit-subject-selector').dataset.selected;
+    if (currentSubject) {
+        // Wait for subjects to load, then select
+        setTimeout(() => {
+            document.getElementById('edit-subject-selector').value = currentSubject;
+        }, 500);
+    }
+    
+    // Load folders
+    loadFolders();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+Hello {{ user.get_full_name }},
+
+Welcome to {{ site_name }}!
+
+Your {{ role_name }} account has been successfully created.
+
+You can now:
+{% if user.user_type == 3 %}
+- Take tests and quizzes
+- View your results and performance
+- Access study materials
+- Track your progress
+{% elif user.user_type == 2 %}
+- Create and manage questions
+- Build and schedule tests
+- Grade student submissions
+- View analytics and reports
+{% elif user.user_type == 1 %}
+- Manage users and roles
+- Monitor system activity
+- Review and approve content
+- Access all administrative features
+{% endif %}
+
+Log in to get started: {{ request.scheme }}://{{ request.get_host }}
+
+If you have any questions, please don't hesitate to contact us.
+
+Best regards,
+The {{ site_name }} Team

@@ -1,0 +1,36 @@
+{% for folder in folders %}
+<div class="folder-item folder-tree-item {% if current_folder and current_folder.id == folder.id %}active selected{% endif %}">
+    <div class="folder-content">
+        <a href="?folder={{ folder.id }}" class="folder-link-tree {% if current_folder and current_folder.id == folder.id %}active-link{% endif %}">
+            <i class="{{ folder.icon }} folder-icon {% if current_folder and current_folder.id == folder.id %}active-icon{% endif %}" data-color="{{ folder.color }}"></i>
+            <span class="folder-text">{{ folder.name }}</span>
+            <span class="folder-badge">{{ folder.get_material_count }}</span>
+        </a>
+        <div class="folder-actions">
+            <button class="btn-folder-action btn-edit-folder {% if current_folder and current_folder.id == folder.id %}active-btn{% endif %}" 
+                    data-action="edit" 
+                    data-folder-id="{{ folder.id }}" 
+                    data-folder-name="{{ folder.name|escapejs }}" 
+                    data-folder-description="{{ folder.description|escapejs }}" 
+                    data-folder-color="{{ folder.color }}" 
+                    data-folder-icon="{{ folder.icon }}" 
+                    title="Edit folder">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-folder-action btn-delete-folder {% if current_folder and current_folder.id == folder.id %}active-btn{% endif %}" 
+                    data-action="delete" 
+                    data-folder-id="{{ folder.id }}" 
+                    data-folder-name="{{ folder.name|escapejs }}" 
+                    title="Delete folder">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+    
+    {% if folder.subfolders.all %}
+    <div class="folder-children">
+        {% include 'materials/partials/material_folder_tree.html' with folders=folder.subfolders.all current_folder=current_folder %}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}

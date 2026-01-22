@@ -1,0 +1,96 @@
+{% extends 'dashboards/teacher_base.html' %}
+{% load static %}
+{% block title %}Tests{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-file-alt"></i> All Tests</h1>
+</div>
+
+{% if tests %}
+<div class="custom-card">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">ID</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Title</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Subject</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Created By</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Created</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Scheduled</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 2px solid #ddd;">Questions</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 2px solid #ddd;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tests %}
+                <tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 15px;">{{ t.id }}</td>
+                    <td style="padding: 15px; font-weight: 600; color: #333;">{{ t.title }}</td>
+                    <td style="padding: 15px;">
+                        <span style="background: #e8f4f8; color: #667eea; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">
+                            {{ t.subject|default:"General" }}
+                        </span>
+                    </td>
+                    <td style="padding: 15px;">{% if t.created_by %}{{ t.created_by.username }}{% else %}-{% endif %}</td>
+                    <td style="padding: 15px; color: #666; font-size: 0.9rem;">{{ t.created_at|date:"M d, Y" }}</td>
+                    <td style="padding: 15px; font-size: 0.9rem;">
+                        {% if t.start_at or t.end_at %}
+                            {% if t.start_at %}
+                                <span style="color: #28a745; font-weight: 500;">
+                                    <i class="fas fa-calendar-check"></i> {{ t.start_at|date:"M d, Y h:i A" }}
+                                </span>
+                            {% elif t.end_at %}
+                                <span style="color: #17a2b8; font-weight: 500;">
+                                    <i class="fas fa-calendar"></i> Until {{ t.end_at|date:"M d, Y h:i A" }}
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color: #dc3545; font-weight: 500;">
+                                <i class="fas fa-calendar-times"></i> Not scheduled
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px;">
+                        <span style="background: #f0f0f0; padding: 4px 12px; border-radius: 6px; font-weight: 600; color: #667eea;">
+                            <i class="fas fa-question-circle"></i> {{ t.questions.count }}
+                        </span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        <a href="{% url 'edit_paper' t.id %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'send_test_reminder' t.id %}" class="btn btn-sm btn-warning" title="Send reminder to students">
+                            <i class="fas fa-bell"></i> Remind
+                        </a>
+                        <a href="{% url 'attempts_list' t.id %}" class="btn btn-sm btn-outline">
+                            <i class="fas fa-users"></i> Attempts
+                        </a>
+                        <form method="POST" action="{% url 'teachers:delete_test' t.id %}" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete the test &quot;{{ t.title }}&quot;? This action cannot be undone.');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-inbox fa-4x"></i>
+    <p>No tests created yet.</p>
+    <a href="{% url 'add_test' %}" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;">
+        Create Your First Test
+    </a>
+</div>
+{% endif %}
+
+<a href="{% url 'teacher_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+{% endblock %}

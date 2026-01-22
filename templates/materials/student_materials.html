@@ -1,0 +1,104 @@
+{% extends 'dashboards/student_base.html' %}
+{% load static %}
+{% block title %}Study Materials{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/materials.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-folder-open"></i> Study Materials</h1>
+</div>
+
+<!-- Filters Card -->
+<div class="custom-card" style="margin-bottom: 25px;">
+    <h4 style="color: #667eea; margin-bottom: 20px;"><i class="fas fa-filter"></i> Filter Materials</h4>
+    <form method="get">
+        <div class="row g-3">
+            <div class="col-md-5">
+                <select name="subject" id="student-material-filter-subject" class="form-control" data-selected="{{ request.GET.subject }}">
+                    <option value="">-- Loading subjects... --</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="topic" value="{{ request.GET.topic }}" class="form-control" placeholder="Filter by Topic (e.g., Calculus)">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" type="submit">
+                    <i class="fas fa-search"></i> Apply
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Materials Grid -->
+{% if materials %}
+<div class="card-grid">
+    {% for m in materials %}
+    <div class="custom-card">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <h3 style="color: #333; margin: 0; font-size: 1.2rem;">{{ m.title }}</h3>
+        </div>
+        
+        {% if m.description %}
+        <p style="color: #666; margin-bottom: 15px;">{{ m.description }}</p>
+        {% endif %}
+        
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+            {% if m.subject %}
+            <span style="background: #e8eaf6; color: #667eea; padding: 5px 12px; border-radius: 15px; font-size: 0.85rem;">
+                <i class="fas fa-book"></i> {{ m.subject }}
+            </span>
+            {% endif %}
+            {% if m.topic %}
+            <span style="background: #f3e5f5; color: #764ba2; padding: 5px 12px; border-radius: 15px; font-size: 0.85rem;">
+                <i class="fas fa-bookmark"></i> {{ m.topic }}
+            </span>
+            {% endif %}
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #f0f0f0;">
+            <small style="color: #999;">
+                <i class="fas fa-user"></i> {{ m.uploaded_by.username }}<br>
+                <i class="fas fa-clock"></i> {{ m.created_at|date:"M d, Y" }}
+            </small>
+            <a href="{{ m.file.url }}" target="_blank" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-folder-open"></i>
+    <p>No study materials available at the moment.</p>
+</div>
+{% endif %}
+
+<a href="{% url 'student_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+
+{% load static %}
+<script src="{% static 'js/subject-selector.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selector = new SubjectSelector('student-material-filter-subject');
+    selector.config.includeAddNew = false; // No add option in filter
+    
+    // Pre-select filtered subject
+    const selectedSubject = document.getElementById('student-material-filter-subject').dataset.selected;
+    if (selectedSubject) {
+        setTimeout(() => {
+            document.getElementById('student-material-filter-subject').value = selectedSubject;
+        }, 500);
+    }
+});
+</script>
+{% endblock %}

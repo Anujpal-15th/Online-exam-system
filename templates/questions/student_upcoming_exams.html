@@ -1,0 +1,57 @@
+{% extends 'dashboards/student_base.html' %}
+{% block title %}Upcoming Exams{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-clock"></i> Upcoming Exams</h1>
+</div>
+    
+{% if tests %}
+<div class="card-grid">
+        {% for test in tests %}
+        <div class="custom-card card-hover">
+            <div class="mb-2">
+                <span class="badge badge-warning"><i class="fas fa-clock"></i> Upcoming</span>
+            </div>
+            <h3 class="mb-3">{{ test.title }}</h3>
+            <div class="mb-4">
+                <p><i class="fas fa-book"></i> <strong>Subject:</strong> {{ test.subject|default:"General" }}</p>
+                <p><i class="fas fa-question-circle"></i> <strong>Questions:</strong> {{ test.questions.count }}</p>
+                <p><i class="fas fa-clock"></i> <strong>Duration:</strong> {{ test.duration_minutes }} minutes</p>
+                <p><i class="fas fa-calendar-alt"></i> <strong>Starts:</strong> {{ test.start_at|date:"M d, Y h:i A" }}</p>
+                {% if test.end_at %}
+                <p><i class="fas fa-calendar-times"></i> <strong>Ends:</strong> {{ test.end_at|date:"M d, Y h:i A" }}</p>
+                {% endif %}
+            </div>
+            
+            {% load tz %}
+            {% now "U" as current_timestamp %}
+            {% if test.start_at %}
+                {% if test.start_at|date:"U" <= current_timestamp %}
+                <a href="{% url 'start_test' test.id %}" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Start Exam
+                </a>
+                {% else %}
+                <button class="btn btn-secondary" disabled>
+                    <i class="fas fa-clock"></i> Not Available Yet
+                </button>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'start_test' test.id %}" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Start Exam
+                </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-calendar-times fa-4x"></i>
+    <p>No upcoming exams scheduled.</p>
+</div>
+{% endif %}
+
+<a href="{% url 'student_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+{% endblock %}

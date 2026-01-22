@@ -1,0 +1,178 @@
+{% extends 'dashboards/teacher_base.html' %}
+{% load static %}
+{% block title %}Grade Test Attempt{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-clipboard-check"></i> Grade Test Submission</h1>
+    <p style="color: #666; margin-top: 10px;">
+        <i class="fas fa-user"></i> <strong>{{ attempt.student.username }}</strong> | 
+        <i class="fas fa-file-alt"></i> {{ attempt.test.title }} | 
+        <i class="fas fa-calendar"></i> Submitted: {{ attempt.submitted_at|date:"M d, Y g:i A" }}
+    </p>
+</div>
+
+<div class="stats-grid" style="margin-bottom: 30px;">
+    <div class="stat-card">
+        <i class="fas fa-list-ol stat-icon"></i>
+        <div class="stat-content">
+            <div class="stat-value">{{ answers_with_details|length }}</div>
+            <div class="stat-label">Total Questions</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-pen stat-icon"></i>
+        <div class="stat-content">
+            <div class="stat-value">{{ subjective_count }}</div>
+            <div class="stat-label">Subjective Questions</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-clock stat-icon" style="color: #f59e0b;"></i>
+        <div class="stat-content">
+            <div class="stat-value">{{ ungraded_count }}</div>
+            <div class="stat-label">Needs Grading</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-trophy stat-icon" style="color: #10b981;"></i>
+        <div class="stat-content">
+            <div class="stat-value">{{ attempt.total_score|default:"-" }}</div>
+            <div class="stat-label">Current Score</div>
+        </div>
+    </div>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    
+    {% for item in answers_with_details %}
+    <div class="custom-card" style="margin-bottom: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.1rem; color: #2d1b4e;">
+                    <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 12px; border-radius: 6px; font-weight: 600; margin-right: 10px;">
+                        Q{{ forloop.counter }}
+                    </span>
+                    {{ item.question.get_type_display }}
+                </h3>
+            </div>
+            <div style="text-align: right;">
+                {% if item.answer.score is not None %}
+                <span style="background: #d1f2eb; color: #0c5460; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                    <i class="fas fa-check-circle"></i> Score: {{ item.answer.score }}/{{ question_points|default:1 }}
+                </span>
+                {% elif item.needs_grading %}
+                <span style="background: #fff3cd; color: #856404; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                    <i class="fas fa-exclamation-circle"></i> Needs Grading
+                </span>
+                {% else %}
+                    {% if item.is_correct %}
+                    <span style="background: #d1f2eb; color: #0c5460; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                        <i class="fas fa-check-circle"></i> Correct
+                    </span>
+                    {% elif item.is_correct == False %}
+                    <span style="background: #f8d7da; color: #721c24; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                        <i class="fas fa-times-circle"></i> Incorrect
+                    </span>
+                    {% else %}
+                    <span style="background: #e3f2fd; color: #1565c0; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">
+                        <i class="fas fa-robot"></i> Auto-graded
+                    </span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+                <strong style="color: #2d1b4e; display: block; margin-bottom: 8px;">Question:</strong>
+                <p style="margin: 0; color: #333; line-height: 1.6;">{{ item.question.question_text }}</p>
+            </div>
+        </div>
+
+        {% if item.question.type == 'mcq_single' %}
+        <div style="margin-bottom: 20px;">
+            <strong style="color: #2d1b4e; display: block; margin-bottom: 10px;">Options:</strong>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for option in item.question.options.all %}
+                <div style="padding: 12px; border-radius: 8px; border: 2px solid {% if option.id|stringformat:'s' == item.answer.answer_text %}#667eea{% elif option.is_correct %}#10b981{% else %}#e5e7eb{% endif %}; background: {% if option.id|stringformat:'s' == item.answer.answer_text %}#f0f4ff{% elif option.is_correct %}#ecfdf5{% else %}#f9fafb{% endif %};">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        {% if option.id|stringformat:'s' == item.answer.answer_text %}
+                        <i class="fas fa-user-check" style="color: #667eea;"></i>
+                        {% endif %}
+                        {% if option.is_correct %}
+                        <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                        {% endif %}
+                        <span style="color: #333;">{{ option.text }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="margin-bottom: 15px;">
+            <strong style="color: #2d1b4e; display: block; margin-bottom: 8px;">Student's Answer:</strong>
+            <div style="background: #fff; padding: 15px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                {% if item.answer.answer_text %}
+                <p style="margin: 0; color: #333; white-space: pre-wrap;">{{ item.answer.answer_text }}</p>
+                {% else %}
+                <p style="margin: 0; color: #999; font-style: italic;">No answer provided</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if item.correct_answer and item.is_correct == False %}
+        <div style="margin-bottom: 15px;">
+            <strong style="color: #10b981; display: block; margin-bottom: 8px;">
+                <i class="fas fa-lightbulb"></i> Correct Answer:
+            </strong>
+            <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; border: 2px solid #10b981;">
+                <p style="margin: 0; color: #065f46;">{{ item.correct_answer }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if item.needs_grading %}
+        <div style="background: #fffbeb; padding: 20px; border-radius: 8px; border: 2px solid #f59e0b;">
+            <label style="display: block; font-weight: 600; color: #2d1b4e; margin-bottom: 10px;">
+                <i class="fas fa-star"></i> Assign Score (out of {{ question_points|default:1 }} points):
+            </label>
+            <input 
+                type="number" 
+                name="score_{{ item.answer.id }}" 
+                min="0" 
+                max="{{ question_points|default:1 }}"
+                value="{{ item.answer.score|default:'' }}"
+                class="form-control"
+                style="max-width: 200px; padding: 10px; font-size: 1rem; border: 2px solid #667eea; border-radius: 8px;"
+                required
+            >
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if ungraded_count > 0 %}
+    <div style="display: flex; gap: 15px; margin-top: 30px;">
+        <button type="submit" class="btn btn-primary" style="padding: 15px 40px; font-size: 1rem;">
+            <i class="fas fa-save"></i> Save Grades & Calculate Score
+        </button>
+        <a href="{% url 'submissions_list' %}" class="btn btn-secondary" style="padding: 15px 40px; font-size: 1rem;">
+            <i class="fas fa-times"></i> Cancel
+        </a>
+    </div>
+    {% else %}
+    <div style="background: #d1f2eb; padding: 20px; border-radius: 8px; border: 2px solid #0c5460; margin-top: 30px;">
+        <p style="margin: 0; color: #0c5460; font-weight: 600;">
+            <i class="fas fa-check-circle"></i> All questions have been graded. Total Score: <strong style="font-size: 1.2rem;">{{ attempt.total_score }}</strong>
+        </p>
+    </div>
+    <a href="{% url 'submissions_list' %}" class="back-link" style="margin-top: 20px; display: inline-block;">
+        <i class="fas fa-arrow-left"></i> Back to Submissions
+    </a>
+    {% endif %}
+</form>
+
+{% endblock %}

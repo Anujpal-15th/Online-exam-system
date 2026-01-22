@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .result-box { background: white; padding: 25px; margin: 20px 0; border-radius: 10px; text-align: center; }
+        .score { font-size: 48px; font-weight: bold; color: #667eea; margin: 10px 0; }
+        .percentage { font-size: 24px; color: #777; }
+        .status { display: inline-block; padding: 10px 20px; margin: 15px 0; border-radius: 20px; font-weight: bold; }
+        .status.passed { background: #d4edda; color: #155724; }
+        .status.failed { background: #f8d7da; color: #721c24; }
+        .detail-row { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 20px; color: #777; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Test Results Available</h1>
+        </div>
+        <div class="content">
+            <p>Hello {{ student.get_full_name }},</p>
+            
+            <p>Your test "<strong>{{ test.title }}</strong>" has been graded!</p>
+            
+            <div class="result-box">
+                <div class="score">{{ attempt.total_score }}/{{ test.total_marks }}</div>
+                <div class="percentage">{{ percentage }}%</div>
+                <div class="status {% if status == 'Passed' %}passed{% else %}failed{% endif %}">
+                    {{ status }}
+                </div>
+            </div>
+            
+            {% if attempt.submitted_at %}
+            <div class="detail-row">
+                <strong>Submitted:</strong> {{ attempt.submitted_at|date:"F d, Y - g:i A" }}
+            </div>
+            {% endif %}
+            
+            {% if status == 'Passed' %}
+            <p style="text-align: center; color: #28a745; font-size: 18px;">
+                🎉 Congratulations on passing the test!
+            </p>
+            {% else %}
+            <p style="text-align: center; color: #dc3545;">
+                Keep working hard! You can do better next time.
+            </p>
+            {% endif %}
+            
+            <p style="text-align: center;">
+                <a href="{{ request.scheme }}://{{ request.get_host }}" class="btn">View Detailed Results</a>
+            </p>
+            
+            <div class="footer">
+                <p>Best regards,<br>The {{ site_name }} Team</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

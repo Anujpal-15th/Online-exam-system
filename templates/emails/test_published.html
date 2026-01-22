@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .test-details { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #667eea; border-radius: 5px; }
+        .test-details h3 { margin-top: 0; color: #667eea; }
+        .detail-row { margin: 10px 0; }
+        .detail-label { font-weight: bold; color: #555; }
+        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 20px 0; }
+        .footer { text-align: center; margin-top: 20px; color: #777; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 New Test Available!</h1>
+        </div>
+        <div class="content">
+            <p>Hello {{ student.get_full_name }},</p>
+            
+            <p>A new test has been published and is now available for you!</p>
+            
+            <div class="test-details">
+                <h3>{{ test.title }}</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Subject:</span> {{ test.subject }}
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duration:</span> {{ test.duration_minutes }} minutes
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Total Marks:</span> {{ test.total_marks }}
+                </div>
+                {% if test.start_at %}
+                <div class="detail-row">
+                    <span class="detail-label">Start Time:</span> {{ test.start_at|date:"F d, Y - g:i A" }}
+                </div>
+                {% endif %}
+                {% if test.end_at %}
+                <div class="detail-row">
+                    <span class="detail-label">End Time:</span> {{ test.end_at|date:"F d, Y - g:i A" }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <p style="text-align: center;">
+                <a href="{{ request.scheme }}://{{ request.get_host }}" class="btn">Take Test Now</a>
+            </p>
+            
+            <p>Good luck!</p>
+            
+            <div class="footer">
+                <p>Best regards,<br>The {{ site_name }} Team</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

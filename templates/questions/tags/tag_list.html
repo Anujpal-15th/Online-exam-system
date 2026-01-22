@@ -1,0 +1,367 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Question Tags - Online Exam Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tags.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Question Tags</h2>
+            <p class="text-muted mb-0">Organize questions with custom labels and categories</p>
+        </div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTagModal">
+            <i class="fas fa-plus me-2"></i>Create Tag
+        </button>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Total Tags</h6>
+                    <h3 class="mb-0">{{ total_tags }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if tags %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tag Name</th>
+                                <th>Preview</th>
+                                <th>Description</th>
+                                <th>Questions</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tag in tags %}
+                            <tr>
+                                <td>
+                                    <strong>{{ tag.name }}</strong>
+                                    <small class="text-muted d-block">{{ tag.slug }}</small>
+                                </td>
+                                <td>
+                                    <span class="tag-preview-badge" data-tag-color="{{ tag.color }}">
+                                        {{ tag.name }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if tag.description %}
+                                        {{ tag.description|truncatewords:10 }}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ tag.question_count }} question{{ tag.question_count|pluralize }}</span>
+                                </td>
+                                <td>
+                                    {% if tag.is_global %}
+                                        <span class="badge bg-success">Global</span>
+                                    {% else %}
+                                        <span class="badge bg-primary">Personal</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-primary edit-tag-btn" 
+                                                data-tag-id="{{ tag.id }}"
+                                                data-tag-name="{{ tag.name }}"
+                                                data-tag-color="{{ tag.color }}"
+                                                data-tag-description="{{ tag.description }}"
+                                                data-tag-global="{{ tag.is_global|yesno:'true,false' }}"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#editTagModal">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger delete-tag-btn"
+                                                data-tag-id="{{ tag.id }}"
+                                                data-tag-name="{{ tag.name }}"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteTagModal">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                    <h5>No Tags Yet</h5>
+                    <p class="text-muted">Create your first tag to start organizing questions</p>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTagModal">
+                        <i class="fas fa-plus me-2"></i>Create Tag
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Create Tag Modal -->
+<div class="modal fade" id="createTagModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Tag</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createTagForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tag Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" required maxlength="50" placeholder="e.g., Important, PYQ 2023">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <input type="color" class="form-control form-control-color tag-color-picker" name="color" value="#3b82f6">
+                            <small class="text-muted">Select a color for the tag badge</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="2" placeholder="Optional description..."></textarea>
+                    </div>
+                    {% if user.user_type == 1 %}
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_global" id="createGlobal">
+                            <label class="form-check-label" for="createGlobal">
+                                Make this tag available to all teachers
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Tag</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Tag Modal -->
+<div class="modal fade" id="editTagModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Tag</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editTagForm">
+                {% csrf_token %}
+                <input type="hidden" name="tag_id" id="editTagId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tag Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" id="editTagName" required maxlength="50">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <input type="color" class="form-control form-control-color tag-color-picker" name="color" id="editTagColor">
+                            <small class="text-muted">Select a color for the tag badge</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" id="editTagDescription" rows="2"></textarea>
+                    </div>
+                    {% if user.user_type == 1 %}
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_global" id="editGlobal">
+                            <label class="form-check-label" for="editGlobal">
+                                Make this tag available to all teachers
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Tag Modal -->
+<div class="modal fade" id="deleteTagModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Tag</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="deleteTagForm">
+                {% csrf_token %}
+                <input type="hidden" name="tag_id" id="deleteTagId">
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the tag <strong id="deleteTagName"></strong>?</p>
+                    <p class="text-muted mb-0">This will remove the tag from all questions but will not delete the questions.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete Tag</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Apply tag colors dynamically
+    document.querySelectorAll('.tag-preview-badge[data-tag-color]').forEach(badge => {
+        badge.style.backgroundColor = badge.dataset.tagColor;
+    });
+    
+    // Create tag form handler
+    const createForm = document.getElementById('createTagForm');
+    createForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(createForm);
+        const data = {
+            name: formData.get('name'),
+            color: formData.get('color'),
+            description: formData.get('description'),
+            is_global: formData.get('is_global') === 'on'
+        };
+        
+        try {
+            const response = await fetch('{% url "create_tag" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.error || 'Failed to create tag');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+    
+    // Edit tag button handlers
+    document.querySelectorAll('.edit-tag-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('editTagId').value = this.dataset.tagId;
+            document.getElementById('editTagName').value = this.dataset.tagName;
+            document.getElementById('editTagColor').value = this.dataset.tagColor;
+            document.getElementById('editTagDescription').value = this.dataset.tagDescription;
+            const globalCheckbox = document.getElementById('editGlobal');
+            if (globalCheckbox) {
+                globalCheckbox.checked = this.dataset.tagGlobal === 'true';
+            }
+        });
+    });
+    
+    // Edit tag form handler
+    const editForm = document.getElementById('editTagForm');
+    editForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(editForm);
+        const tagId = formData.get('tag_id');
+        const data = {
+            name: formData.get('name'),
+            color: formData.get('color'),
+            description: formData.get('description'),
+            is_global: formData.get('is_global') === 'on'
+        };
+        
+        try {
+            const response = await fetch(`/questions/tags/${tagId}/edit/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.error || 'Failed to update tag');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+    
+    // Delete tag button handlers
+    document.querySelectorAll('.delete-tag-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('deleteTagId').value = this.dataset.tagId;
+            document.getElementById('deleteTagName').textContent = this.dataset.tagName;
+        });
+    });
+    
+    // Delete tag form handler
+    const deleteForm = document.getElementById('deleteTagForm');
+    deleteForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(deleteForm);
+        const tagId = formData.get('tag_id');
+        
+        try {
+            const response = await fetch(`/questions/tags/${tagId}/delete/`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                location.reload();
+            } else {
+                alert(result.error || 'Failed to delete tag');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    });
+});
+</script>
+{% endblock %}

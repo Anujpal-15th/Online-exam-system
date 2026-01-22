@@ -1,0 +1,200 @@
+/**
+ * ============================================================================
+ * MOBILE RESPONSIVENESS - GLOBAL STYLES
+ * ============================================================================
+ * 
+ * Comprehensive responsive styles for all devices
+ * ============================================================================
+ */
+
+/* ============================================================================
+   TABLET AND MOBILE (768px and below)
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    /* Typography */
+    body {
+        font-size: 14px;
+    }
+    
+    h1 {
+        font-size: 1.75rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.25rem;
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    
+    .btn i {
+        font-size: 14px;
+    }
+    
+    /* Forms */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea,
+    select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+    }
+    
+    /* Cards */
+    .custom-card,
+    .card {
+        margin-bottom: 15px;
+    }
+    
+    /* Modals */
+    .modal-dialog {
+        margin: 10px;
+    }
+    
+    /* Alerts */
+    .alert {
+        font-size: 14px;
+        padding: 12px;
+    }
+    
+    /* Back links */
+    .back-link {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+    
+    /* Empty states */
+    .empty-state {
+        padding: 40px 15px;
+    }
+    
+    .empty-state i {
+        font-size: 3rem !important;
+    }
+    
+    .empty-state p {
+        font-size: 14px;
+    }
+}
+
+/* ============================================================================
+   MOBILE PHONES (480px and below)
+   ============================================================================ */
+
+@media (max-width: 480px) {
+    /* Typography */
+    body {
+        font-size: 13px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    h3 {
+        font-size: 1.1rem;
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+    
+    /* Cards with multiple actions */
+    .card-header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .card-header-section .btn {
+        width: 100%;
+    }
+    
+    /* Notifications header */
+    .notifications-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .notifications-header > div:last-child {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .notifications-header form {
+        width: 100%;
+    }
+    
+    .notifications-header button {
+        width: 100%;
+    }
+    
+    /* Empty states */
+    .empty-state {
+        padding: 30px 10px;
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem !important;
+    }
+}
+
+/* ============================================================================
+   LANDSCAPE MOBILE (Small height)
+   ============================================================================ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .dashboard-sidebar {
+        overflow-y: auto;
+        max-height: calc(100vh - 60px);
+    }
+    
+    .page-header {
+        margin-bottom: 15px;
+    }
+    
+    .empty-state {
+        padding: 20px 15px;
+    }
+}
+
+/* ============================================================================
+   TOUCH IMPROVEMENTS
+   ============================================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+    /* Increase tap targets */
+    .sidebar-link,
+    .btn,
+    a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .sidebar-link:hover,
+    .btn:hover {
+        transform: none;
+    }
+}

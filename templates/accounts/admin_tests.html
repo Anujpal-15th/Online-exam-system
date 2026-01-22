@@ -1,0 +1,117 @@
+{% extends 'dashboards/admin_base.html' %}
+{% block title %}All Tests{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-file-alt"></i> All Tests</h1>
+</div>
+
+<!-- Search Bar -->
+<div class="custom-card" style="margin-bottom: 20px;">
+    <form method="GET" action="">
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" name="search" value="{{ search_query }}" 
+                   placeholder="Search by test title or teacher name..." 
+                   class="form-input" style="flex: 1;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Search
+            </button>
+            {% if search_query %}
+            <a href="{% url 'admin_tests' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Clear
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Tests Table -->
+<div class="custom-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: #667eea; margin: 0;">
+            <i class="fas fa-clipboard-list"></i> All Tests 
+            <span class="badge badge-primary" style="color: white;">{{ tests.count }}</span>
+        </h3>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> ID</th>
+                    <th><i class="fas fa-heading"></i> Test Title</th>
+                    <th><i class="fas fa-user"></i> Created By</th>
+                    <th class="text-center"><i class="fas fa-list-ol"></i> Questions</th>
+                    <th class="text-center"><i class="fas fa-clock"></i> Duration</th>
+                    <th class="text-center"><i class="fas fa-star"></i> Total Marks</th>
+                    <th><i class="fas fa-calendar"></i> Created</th>
+                    <th class="text-center"><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for test in tests %}
+                <tr>
+                    <td><strong>#{{ test.id }}</strong></td>
+                    <td>
+                        <strong>{{ test.title }}</strong>
+                        {% if test.description %}
+                        <br>
+                        <small style="color: #999;">{{ test.description|truncatewords:10 }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ test.created_by.username }}</strong>
+                        <br>
+                        <small style="color: #999;">{{ test.created_by.email }}</small>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge badge-info">{{ test.questions.count }}</span>
+                    </td>
+                    <td class="text-center">
+                        {% if test.duration_minutes %}
+                            <span class="badge badge-warning">{{ test.duration_minutes }} min</span>
+                        {% else %}
+                            <span class="badge badge-secondary">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if test.total_marks %}
+                            <span class="badge badge-success">{{ test.total_marks }}</span>
+                        {% else %}
+                            <span class="badge badge-secondary">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ test.created_at|date:"M d, Y" }}</td>
+                    <td class="text-center">
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <a href="{% url 'teachers:preview_test' test.id %}" class="btn btn-sm btn-info" title="Preview Test">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <form method="POST" action="{% url 'admin_delete_test' test.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this test? This action cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" title="Delete Test">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center" style="padding: 40px; color: #999;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <p>
+                            {% if search_query %}
+                                No tests found matching "{{ search_query }}"
+                            {% else %}
+                                No tests available yet
+                            {% endif %}
+                        </p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

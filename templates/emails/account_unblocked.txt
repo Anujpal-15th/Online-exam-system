@@ -1,0 +1,10 @@
+Hello {{ user.get_full_name }},
+
+Good news! Your {{ site_name }} account has been reactivated.
+
+You can now log in and access all features.
+
+Welcome back!
+
+Best regards,
+The {{ site_name }} Team

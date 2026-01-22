@@ -1,0 +1,28 @@
+/* ============================================
+   TEST ANALYTICS PAGE STYLES
+   ============================================ */
+
+.custom-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.custom-card h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 20px;
+}
+
+.data-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.stat-card {
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}

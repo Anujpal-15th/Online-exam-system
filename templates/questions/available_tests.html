@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Available Tests{% endblock %}
+{% block content %}
+<div class="container">
+  <h2 class="mb-3">Available Tests</h2>
+  {% if tests %}
+    <div class="list-group">
+      {% for t in tests %}
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-semibold">{{ t.title }}</div>
+            <div class="text-muted small">
+              {% if t.start_at %}Starts: {{ t.start_at|date:'Y-m-d H:i' }}{% else %}Starts: anytime{% endif %}
+              ·
+              {% if t.end_at %}Ends: {{ t.end_at|date:'Y-m-d H:i' }}{% else %}No end time{% endif %}
+              · Duration: {{ t.duration_minutes }} mins
+            </div>
+          </div>
+          <a class="btn btn-primary" href="{% url 'start_test' t.id %}">Start</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No tests are currently available.</p>
+  {% endif %}
+</div>
+{% endblock %}

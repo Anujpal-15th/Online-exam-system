@@ -1,0 +1,189 @@
+{% extends 'dashboards/teacher_base.html' %}
+{% load static %}
+{% block title %}Paper Builder - Scheduling Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/paper-builder.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-calendar-check"></i> Paper Builder</h1>
+    <p>Schedule and manage your test papers</p>
+</div>
+
+<!-- Unscheduled Tests Section -->
+<div class="custom-card paper-builder-card">
+    <div class="paper-builder-header">
+        <h2 class="paper-builder-title">
+            <i class="fas fa-clock"></i> Tests Awaiting Schedule
+        </h2>
+        <span class="paper-builder-badge">
+            {{ unscheduled_tests|length }} Pending
+        </span>
+    </div>
+
+    {% if unscheduled_tests %}
+        <div class="paper-builder-table-wrapper">
+            <table class="paper-builder-table">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Questions</th>
+                        <th class="text-center">Marks</th>
+                        <th class="text-center">Duration</th>
+                        <th class="text-center">Created Date</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in unscheduled_tests %}
+                    <tr>
+                        <td>
+                            <div class="paper-builder-test-title">{{ item.test.title }}</div>
+                            <div class="paper-builder-test-meta">
+                                <span class="paper-builder-subject-badge">{{ item.test.subject|default:"General" }}</span>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="paper-builder-status-badge">
+                                <i class="fas fa-exclamation-triangle"></i> Not Scheduled
+                            </span>
+                        </td>
+                        <td class="text-center paper-builder-value primary">{{ item.question_count }}</td>
+                        <td class="text-center paper-builder-value success">{{ item.total_marks }}</td>
+                        <td class="text-center paper-builder-value" style="color: #ff6b6b;">{{ item.test.duration_minutes }}m</td>
+                        <td class="text-center paper-builder-date">
+                            {{ item.test.created_at|date:"M d, Y" }}<br>
+                            <span style="color: #999;">{{ item.test.created_at|date:"h:i A" }}</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="paper-builder-actions">
+                                <a href="{% url 'edit_paper' item.test.id %}" title="Add Schedule" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </a>
+                                <a href="{% url 'edit_paper' item.test.id %}" title="Edit Test" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'teachers:preview_test' item.test.id %}" title="Preview" class="btn btn-sm" style="background: #1976d2; color: white;">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-check-circle empty-state-icon"></i>
+            <p class="empty-state-title">All tests are scheduled!</p>
+            <p class="empty-state-subtitle">Create a new test to schedule it.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Scheduled Tests Section -->
+<div class="custom-card paper-builder-card">
+    <div class="paper-builder-header">
+        <h2 class="paper-builder-title" style="color: #28a745;">
+            <i class="fas fa-calendar-check"></i> Scheduled Tests
+        </h2>
+        <span class="paper-builder-badge" style="background: #28a745; color: white;">
+            {{ scheduled_tests|length }} Scheduled
+        </span>
+    </div>
+
+    {% if scheduled_tests %}
+        <div class="paper-builder-table-wrapper">
+            <table class="paper-builder-table">
+                <thead class="scheduled-tests-header">
+                    <tr>
+                        <th>Test Name</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Questions</th>
+                        <th class="text-center">Marks</th>
+                        <th class="text-center">Duration</th>
+                        <th class="text-center">Start Time</th>
+                        <th class="text-center">End Time</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in scheduled_tests %}
+                    <tr class="scheduled-table-row">
+                        <td>
+                            <div class="paper-builder-test-title">{{ item.test.title }}</div>
+                            <div class="paper-builder-test-meta">
+                                <span class="paper-builder-subject-badge">{{ item.test.subject|default:"General" }}</span>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            {% if item.status == 'active' %}
+                                <span class="scheduled-badge-success">
+                                    <i class="fas fa-circle" style="font-size: 8px;"></i> Active
+                                </span>
+                            {% elif item.status == 'upcoming' %}
+                                <span class="paper-builder-badge">
+                                    <i class="fas fa-clock"></i> Upcoming
+                                </span>
+                            {% elif item.status == 'expired' %}
+                                <span class="scheduled-badge-danger" style="background: #6c757d;">
+                                    <i class="fas fa-check"></i> Expired
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center paper-builder-value primary">{{ item.question_count }}</td>
+                        <td class="text-center paper-builder-value success">{{ item.total_marks }}</td>
+                        <td class="text-center paper-builder-value" style="color: #ff6b6b;">{{ item.test.duration_minutes }}m</td>
+                        <td class="text-center schedule-date-time">
+                            {% if item.test.start_at %}
+                                {{ item.test.start_at|date:"M d, Y" }}<br>
+                                <span style="color: #1976d2;">{{ item.test.start_at|time:"h:i A" }}</span>
+                            {% else %}
+                                <span style="color: #999;">Immediate</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px; text-align: center; font-size: 13px;">
+                            {% if item.test.end_at %}
+                                {{ item.test.end_at|date:"M d, Y" }}<br>
+                                <span style="color: #28a745;">{{ item.test.end_at|time:"h:i A" }}</span>
+                            {% else %}
+                                <span style="color: #28a745;">No limit</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 15px; text-align: center;">
+                            <div style="display: inline-flex; gap: 6px; justify-content: center; align-items: center;">
+                                <a href="{% url 'edit_paper' item.test.id %}" title="Update Schedule" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </a>
+                                <a href="{% url 'teachers:test_analytics' item.test.id %}" title="Analytics" class="btn btn-sm" style="background: #17a2b8; color: white;">
+                                    <i class="fas fa-chart-line"></i>
+                                </a>
+                                <a href="{% url 'teachers:preview_test' item.test.id %}" title="Preview" class="btn btn-sm btn-success">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-calendar-times empty-state-icon"></i>
+            <p class="empty-state-title">No scheduled tests yet.</p>
+            <p class="empty-state-subtitle">Schedule your tests to make them available to students.</p>
+        </div>
+    {% endif %}
+</div>
+
+<a href="{% url 'teacher_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+
+{% endblock %}

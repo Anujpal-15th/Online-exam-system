@@ -1,96 +1,1173 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}Questions List{% endblock %}
+{% extends 'dashboards/teacher_base.html' %}
+{% block title %}Question Bank{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<div class="page-header">
+    <h1><i class="fas fa-database"></i> Question Bank</h1>
+</div>
 
+<div class="dashboard-content-wrapper">
+    <!-- Folder Sidebar -->
+    <div class="folder-sidebar">
+        <div class="custom-card folder-panel">
+            <div class="card-header-section">
+                <h3 class="card-section-title"><i class="fas fa-folder-tree"></i> Folders</h3>
+                <button class="btn btn-sm btn-primary" onclick="showCreateFolderModal()" title="Create New Folder">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <!-- All Questions Link -->
+            <div class="folder-item folder-link {% if request.GET.folder == 'all' %}active{% endif %}">
+                <a href="{% url 'questions_list' %}?folder=all" class="folder-link-a">
+                    <i class="fas fa-list" style="color: #667eea;"></i>
+                    <span class="folder-name">All Questions</span>
+                </a>
+            </div>
+            
+            <!-- Unassigned Questions Link -->
+            <div class="folder-item folder-link {% if not current_folder and not request.GET.folder %}active{% endif %}">
+                <a href="{% url 'questions_list' %}" class="folder-link-a">
+                    <i class="fas fa-inbox" style="color: #6c757d;"></i>
+                    <span class="folder-name">Unassigned</span>
+                </a>
+            </div>
+            
+            <!-- Folder Tree -->
+            <div id="folder-tree" style="margin-top: 10px;">
+                {% include 'questions/partials/folder_tree.html' with folders=folders current_folder=current_folder %}
+            </div>
+        </div>
+    </div>
 
-<div class="dashboard-container">
-
-  <!-- Sidebar -->
-  <div class="dashboard-sidebar">
-    <h2>Browse Questions</h2>
-
-    {% if user.is_authenticated %}
-        {% if user.user_type == 3 %}
-            <a href="{% url 'questions_list' %}">Browse Questions</a>
-            <a href="{% url 'student_submissions' %}">My Submissions</a>
-            <a href="{% url 'mock_test' %}">Mock Test</a>
-        {% elif user.user_type == 2 %}
-            <a href="{% url 'questions_list' %}">Manage Questions</a>
-            <a href="{% url 'add_question' %}">Add New Question</a>
-            <a href="{% url 'submissions_list' %}">All Submissions</a>
-            <a href="{% url 'teacher_reports' %}">Performance Reports</a>
-            <a href="{% url 'mock_test' %}">Mock Test</a>
-            <a href="{% url 'export_performance_csv' %}">Export CSV</a>
-        {% elif user.user_type == 1 %}
-            <a href="{% url 'questions_list' %}">Manage Questions</a>
-            <a href="{% url 'admin_users' %}">Manage Users</a>
-            <a href="{% url 'admin_activity' %}">Reports</a>
+    <!-- Main Content -->
+    <div>
+        <!-- Breadcrumb -->
+        {% if current_folder %}
+        <div class="custom-card breadcrumb-card">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="margin: 0; background: none; padding: 0;">
+                    <li class="breadcrumb-item"><a href="{% url 'questions_list' %}?folder=all"><i class="fas fa-home"></i> All Questions</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ current_folder.get_full_path }}</li>
+                </ol>
+            </nav>
+        </div>
+        {% elif request.GET.folder == 'all' %}
+        <div class="custom-card breadcrumb-card">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="margin: 0; background: none; padding: 0;">
+                    <li class="breadcrumb-item active" aria-current="page"><i class="fas fa-list"></i> All Questions</li>
+                </ol>
+            </nav>
+        </div>
         {% endif %}
-    {% else %}
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'register' %}">Register</a>
-    {% endif %}
-  </div>
 
-  <!-- Main content -->
-  <div class="dashboard-main">
-    <h2>Browse Questions</h2>
+        <!-- Search/Filter Card -->
+        <div class="custom-card">
+            <h3 class="card-section-title"><i class="fas fa-search"></i> Search & Filter</h3>
+            
+            <!-- Tag Filter Pills -->
+            {% if available_tags %}
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-tags"></i> Filter by Tag</label>
+                <div class="tag-pills-container">
+                    <a href="?" class="tag-filter-pill {% if not current_tag %}active{% endif %}" data-tag-color="#6c757d">
+                        All
+                    </a>
+                    {% for tag in available_tags %}
+                    <a href="?tag={{ tag.slug }}" class="tag-filter-pill {% if current_tag.id == tag.id %}active{% else %}inactive{% endif %}" 
+                       data-tag-color="{{ tag.color }}">
+                        {{ tag.name }} <span class="badge bg-light text-dark ms-1">{{ tag.question_count }}</span>
+                    </a>
+                    {% endfor %}
+                    <a href="{% url 'tag_list' %}" class="tag-filter-pill" data-tag-color="#17a2b8">
+                        <i class="fas fa-cog"></i> Manage Tags
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+            <form method="get" class="row g-3">
+                {% if current_folder %}<input type="hidden" name="folder" value="{{ current_folder.id }}">{% endif %}
+                {% if current_tag %}<input type="hidden" name="tag" value="{{ current_tag.slug }}">{% endif %}
+                <div class="col-md-3">
+                    <label class="form-label"><i class="fas fa-text-width"></i> Search Text</label>
+                    <input type="text" name="q" class="form-control" placeholder="Search question text" value="{{ request.GET.q }}" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label"><i class="fas fa-book-open"></i> Subject</label>
+                    <select name="subject" id="filter-subject-selector" class="form-control" data-selected="{{ request.GET.subject }}">
+                        <option value="">-- Loading subjects... --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label"><i class="fas fa-tag"></i> Topic</label>
+                    <input type="text" name="topic" class="form-control" placeholder="Topic" value="{{ request.GET.topic }}" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label"><i class="fas fa-chart-line"></i> Difficulty</label>
+                    <select name="difficulty" class="form-control">
+                        <option value="">Any difficulty</option>
+                        <option value="easy" {% if request.GET.difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                        <option value="medium" {% if request.GET.difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="hard" {% if request.GET.difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
 
-    <!-- Search/filter panel -->
-    <!-- Search/filter panel -->
-<div class="search-panel">
-  <form method="get" class="search-form">
-    <input type="text" name="q" placeholder="Search question text" value="{{ request.GET.q }}" />
-    <input type="text" name="subject" placeholder="Subject" value="{{ request.GET.subject }}" />
-    <input type="text" name="topic" placeholder="Topic" value="{{ request.GET.topic }}" />
+        <!-- Bulk Actions Bar -->
+        <div class="custom-card bulk-actions-bar" id="bulk-actions-bar">
+            <div class="bulk-actions-content">
+                <span class="bulk-actions-label"><i class="fas fa-check-square"></i> <strong id="selected-count">0</strong> question(s) selected</span>
+                <div class="bulk-actions-buttons">
+                    <button class="btn btn-sm btn-primary" onclick="showAssignTagsModal()">
+                        <i class="fas fa-tags"></i> Assign Tags
+                    </button>
+                    <button class="btn btn-sm btn-success" onclick="showMoveToFolderModal()">
+                        <i class="fas fa-folder-plus"></i> Move to Folder
+                    </button>
+                    <button class="btn btn-sm btn-secondary" onclick="clearSelection()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </div>
 
-      <select name="difficulty">
-        <option value="">Any difficulty</option>
-        <option value="easy" {% if request.GET.difficulty == 'easy' %}selected{% endif %}>Easy</option>
-        <option value="medium" {% if request.GET.difficulty == 'medium' %}selected{% endif %}>Medium</option>
-        <option value="hard" {% if request.GET.difficulty == 'hard' %}selected{% endif %}>Hard</option>
-      </select>
-      <button type="submit" title="Filter"><i class="fas fa-filter"></i></button>
-  </form>
+                <!-- Questions Table -->
+        <div class="custom-card">
+            <div class="card-header-section">
+                <h3 class="card-section-title"><i class="fas fa-list-check"></i> Questions</h3>
+                <a href="{% url 'add_question' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Question
+                </a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">
+                                <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)">
+                            </th>
+                            <th style="width: 60px;"><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-question-circle"></i> Question</th>
+                            <th><i class="fas fa-book-open"></i> Subject</th>
+                            <th style="width: 150px;"><i class="fas fa-tag"></i> Topic</th>
+                            <th style="width: 120px;"><i class="fas fa-chart-line"></i> Difficulty</th>
+                            <th class="text-center" style="width: 120px;"><i class="fas fa-cog"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question in questions %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="question-checkbox" value="{{ question.id }}" onchange="updateBulkActions()">
+                            </td>
+                            <td><strong class="text-primary">#{{ question.id }}</strong></td>
+                            <td class="question-text">
+                                {{ question.question_text|truncatewords:15 }}
+                                {% if question.tags.all %}
+                                    <div class="question-tags-container">
+                                        {% for tag in question.tags.all %}
+                                        <span class="tag-badge tag-badge-sm" data-tag-color="{{ tag.color }}">
+                                            {{ tag.name }}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge badge-subject">
+                                    {{ question.subject }}
+                                </span>
+                            </td>
+                            <td><span class="text-muted">{{ question.topic|default:"—" }}</span></td>
+                            <td>
+                                {% if question.difficulty == 'easy' %}
+                                    <span class="badge badge-success">Easy</span>
+                                {% elif question.difficulty == 'medium' %}
+                                    <span class="badge badge-warning">Medium</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Hard</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if user.is_authenticated and user.user_type == 1 or user.user_type == 2 %}
+                                    <div class="action-buttons">
+                                        <a href="{% url 'edit_question' question.id %}" class="btn btn-sm btn-action-edit" title="Edit Question">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'delete_question' question.id %}" class="btn btn-sm btn-action-delete" 
+                                           onclick="return confirm('Are you sure you want to delete this question?');" title="Delete Question">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <i class="fas fa-{% if current_folder %}folder-open{% else %}inbox{% endif %}"></i>
+                                {% if current_folder %}
+                                <p style="margin-bottom: 10px;"><strong>This folder "{{ current_folder.name }}" is empty</strong></p>
+                                <p>You can <a href="{% url 'add_question' %}">add new questions</a> and assign them to this folder, or:</p>
+                                <a href="{% url 'questions_list' %}" class="btn btn-sm btn-primary mt-2">
+                                    <i class="fas fa-arrow-left"></i> View All Questions & Use Bulk Actions
+                                </a>
+                                {% else %}
+                                <p>No questions found. Try adjusting your filters or <a href="{% url 'add_question' %}">add a new question</a>.</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <a href="{% url 'teacher_dashboard' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
 </div>
 
-
-    <table border="1" cellpadding="5">
-      <tr>
-        <th>ID</th>
-        <th>Question</th>
-        <th>Subject</th>
-        <th>Topic</th>
-        <th>Difficulty</th>
-        <th>Actions</th>
-      </tr>
-      {% for question in questions %}
-      <tr>
-        <td>{{ question.id }}</td>
-        <td>{{ question.question_text }}</td>
-        <td>{{ question.subject }}</td>
-        <td>{{ question.topic }}</td>
-        <td>{{ question.difficulty }}</td>
-        <td>
-          {% if user.is_authenticated and user.user_type == 2 %}
-            <a href="{% url 'edit_question' question.id %}">Edit</a> |
-            <a href="{% url 'delete_question' question.id %}">Delete</a>
-          {% endif %}
-          {% if user.is_authenticated and user.user_type == 1 %}
-            <a href="{% url 'edit_question' question.id %}">Edit</a> |
-            <a href="{% url 'delete_question' question.id %}">Delete</a>
-          {% endif %}
-          {% if user.is_authenticated and user.user_type == 3 %} 
-            | <a href="{% url 'take_question' question.id %}">Answer</a>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
-
+<!-- Create Folder Modal -->
+<div class="modal fade" id="createFolderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title"><i class="fas fa-folder-plus"></i> Create New Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createFolderForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Folder Name *</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Color</label>
+                            <input type="color" class="form-control" name="color" value="#667eea">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Icon Class</label>
+                            <input type="text" class="form-control" name="icon" value="fas fa-folder" placeholder="fas fa-folder">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createFolder()">
+                    <i class="fas fa-save"></i> Create Folder
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Edit Folder Modal -->
+<div class="modal fade" id="editFolderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title"><i class="fas fa-folder-edit"></i> Edit Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFolderForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="edit-folder-id" name="folder_id">
+                    <div class="mb-3">
+                        <label class="form-label">Folder Name *</label>
+                        <input type="text" class="form-control" id="edit-folder-name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="edit-folder-description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Color</label>
+                            <input type="color" class="form-control" id="edit-folder-color" name="color">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Icon Class</label>
+                            <input type="text" class="form-control" id="edit-folder-icon" name="icon" placeholder="fas fa-folder">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditFolder()">
+                    <i class="fas fa-save"></i> Update Folder
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Move to Folder Modal -->
+<div class="modal fade" id="moveToFolderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="modal-title"><i class="fas fa-folder-plus"></i> Move Questions to Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3"><strong id="move-selected-count">0</strong> question(s) will be moved</p>
+                
+                <!-- Existing Folders List -->
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-folder"></i> Select Existing Folder</label>
+                    <div id="folder-list" class="folder-list-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 10px;">
+                        <!-- Folders will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="text-center my-3">
+                    <strong>— OR —</strong>
+                </div>
+                
+                <!-- Create New Folder Quick Form -->
+                <div class="create-new-folder-section" style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                    <h6 class="mb-3"><i class="fas fa-plus-circle"></i> Create New Folder</h6>
+                    <div class="mb-2">
+                        <input type="text" class="form-control" id="quick-folder-name" placeholder="Folder name *" />
+                    </div>
+                    <div class="mb-2">
+                        <textarea class="form-control" id="quick-folder-description" placeholder="Description (optional)" rows="2"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-primary w-100" onclick="createAndMoveToNewFolder()">
+                        <i class="fas fa-plus"></i> Create Folder & Move Questions
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Tags Modal -->
+<div class="modal fade" id="assignTagsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
+                <h5 class="modal-title"><i class="fas fa-tags"></i> Assign Tags to Questions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3"><strong id="tag-selected-count">0</strong> question(s) will be tagged</p>
+                
+                <div class="mb-3">
+                    <label class="form-label">Select Tags</label>
+                    <div id="tags-list" style="max-height: 250px; overflow-y: auto;">
+                        <!-- Tags will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success flex-fill" onclick="applyTags('add')">
+                        <i class="fas fa-plus"></i> Add Tags
+                    </button>
+                    <button type="button" class="btn btn-danger flex-fill" onclick="applyTags('remove')">
+                        <i class="fas fa-minus"></i> Remove Tags
+                    </button>
+                </div>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <a href="{% url 'tag_list' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-cog"></i> Manage All Tags
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% load static %}
+<script src="{% static 'js/subject-selector.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selector = new SubjectSelector('filter-subject-selector');
+    // For filter dropdown, we want 'All Subjects' as first option
+    selector.config.includeAddNew = false; // Don't show '+ Add New Subject' in filters
+    
+    // Pre-select filtered subject if present
+    const selectedSubject = document.getElementById('filter-subject-selector').dataset.selected;
+    if (selectedSubject) {
+        setTimeout(() => {
+            document.getElementById('filter-subject-selector').value = selectedSubject;
+        }, 500);
+    }
+    
+    // Load folders for bulk action dropdown
+    loadFoldersForBulkAction();
+});
+
+// Show Assign Tags Modal
+function showAssignTagsModal() {
+    const checkboxes = document.querySelectorAll('.question-checkbox:checked');
+    const count = checkboxes.length;
+    
+    if (count === 0) {
+        alert('Please select at least one question');
+        return;
+    }
+    
+    // Update count in modal
+    document.getElementById('tag-selected-count').textContent = count;
+    
+    // Load tags into the modal
+    loadTagsIntoModal();
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('assignTagsModal'));
+    modal.show();
+}
+
+function loadTagsIntoModal() {
+    fetch('{% url "get_tags_json" %}')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('tags-list');
+            
+            if (!data.success || !data.tags || data.tags.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-3"><i class="fas fa-tags"></i> No tags yet. <a href="{% url "tag_list" %}">Create one</a>.</p>';
+                return;
+            }
+            
+            let html = '<div class="form-check-group">';
+            data.tags.forEach(tag => {
+                html += `
+                    <div class="form-check mb-2">
+                        <input class="form-check-input tag-checkbox" type="checkbox" value="${tag.id}" id="tag-${tag.id}">
+                        <label class="form-check-label d-flex align-items-center gap-2" for="tag-${tag.id}">
+                            <span class="badge" style="background-color: ${tag.color};">${tag.name}</span>
+                            ${tag.description ? `<small class="text-muted">${tag.description}</small>` : ''}
+                        </label>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error loading tags:', error);
+            const container = document.getElementById('tags-list');
+            container.innerHTML = '<p class="text-danger">Error loading tags</p>';
+        });
+}
+
+function applyTags(action) {
+    const selectedQuestions = Array.from(document.querySelectorAll('.question-checkbox:checked')).map(cb => cb.value);
+    const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(cb => cb.value);
+    
+    if (selectedTags.length === 0) {
+        alert('Please select at least one tag');
+        return;
+    }
+    
+    fetch('{% url "assign_tags" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            question_ids: selectedQuestions,
+            tag_ids: selectedTags,
+            action: action
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('assignTagsModal')).hide();
+            location.reload();
+        } else {
+            alert(data.error || 'Failed to apply tags');
+        }
+    })
+    .catch(error => {
+        console.error('Error applying tags:', error);
+        alert('Error applying tags');
+    });
+}
+
+// Show Move to Folder Modal
+function showMoveToFolderModal() {
+    const checkboxes = document.querySelectorAll('.question-checkbox:checked');
+    const count = checkboxes.length;
+    
+    if (count === 0) {
+        alert('Please select at least one question');
+        return;
+    }
+    
+    // Update count in modal
+    document.getElementById('move-selected-count').textContent = count;
+    
+    // Load folders into the modal
+    loadFoldersIntoModal();
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('moveToFolderModal'));
+    modal.show();
+}
+
+function loadFoldersIntoModal() {
+    fetch('{% url "get_folders_json" %}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch folders');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const container = document.getElementById('folder-list');
+            
+            if (!data.folders || data.folders.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-3"><i class="fas fa-folder-open"></i> No folders yet. Create one below.</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            function renderFolders(folders, level = 0) {
+                folders.forEach(folder => {
+                    const indent = level * 20;
+                    html += `
+                        <div class="folder-option" onclick="selectFolderAndMove(${folder.id}, '${folder.name.replace(/'/g, "\\'")}')" 
+                             style="padding: 10px; margin-bottom: 5px; border-radius: 6px; cursor: pointer; padding-left: ${indent + 10}px; border: 1px solid #e0e0e0; transition: all 0.2s;"
+                             onmouseover="this.style.background='#f0f4ff'; this.style.borderColor='#667eea';"
+                             onmouseout="this.style.background='white'; this.style.borderColor='#e0e0e0';">
+                            <i class="${folder.icon}" style="color: ${folder.color};"></i>
+                            <strong>${folder.name}</strong>
+                            <span class="badge bg-secondary float-end">${folder.question_count}</span>
+                        </div>
+                    `;
+                    
+                    if (folder.subfolders && folder.subfolders.length > 0) {
+                        renderFolders(folder.subfolders, level + 1);
+                    }
+                });
+            }
+            
+            renderFolders(data.folders);
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error loading folders:', error);
+            document.getElementById('folder-list').innerHTML = '<p class="text-danger">Failed to load folders</p>';
+        });
+}
+
+function selectFolderAndMove(folderId, folderName) {
+    if (!confirm(`Move selected questions to "${folderName}"?`)) {
+        return;
+    }
+    
+    const checkboxes = document.querySelectorAll('.question-checkbox:checked');
+    const questionIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch('{% url "move_questions_to_folder" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            question_ids: questionIds,
+            folder_id: folderId,
+            action: 'add'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('moveToFolderModal'));
+            if (modal) modal.hide();
+            
+            alert(data.message);
+            clearSelection();
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to move questions');
+    });
+}
+
+function createAndMoveToNewFolder() {
+    const folderName = document.getElementById('quick-folder-name').value.trim();
+    const folderDescription = document.getElementById('quick-folder-description').value.trim();
+    
+    if (!folderName) {
+        alert('Please enter a folder name');
+        document.getElementById('quick-folder-name').focus();
+        return;
+    }
+    
+    const checkboxes = document.querySelectorAll('.question-checkbox:checked');
+    const questionIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    // First create the folder
+    fetch('{% url "create_folder" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            name: folderName,
+            description: folderDescription,
+            color: '#667eea',
+            icon: 'fas fa-folder'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Now move questions to the newly created folder
+            return fetch('{% url "move_questions_to_folder" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    question_ids: questionIds,
+                    folder_id: data.folder_id,
+                    action: 'add'
+                })
+            });
+        } else {
+            throw new Error(data.error || 'Failed to create folder');
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('moveToFolderModal'));
+            if (modal) modal.hide();
+            
+            alert('Folder created and questions moved successfully!');
+            clearSelection();
+            location.reload();
+        } else {
+            alert('Folder created but failed to move questions: ' + data.error);
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed: ' + error.message);
+    });
+}
+
+// Folder Management Functions
+function showCreateFolderModal() {
+    const modal = new bootstrap.Modal(document.getElementById('createFolderModal'));
+    modal.show();
+}
+
+function createFolder() {
+    const form = document.getElementById('createFolderForm');
+    const formData = new FormData(form);
+    
+    const data = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        color: formData.get('color'),
+        icon: formData.get('icon')
+    };
+    
+    fetch('{% url "create_folder" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createFolderModal'));
+            if (modal) modal.hide();
+            
+            // Clear form
+            document.getElementById('createFolderForm').reset();
+            
+            // Reload page to show new folder in sidebar
+            setTimeout(() => location.reload(), 500);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to create folder');
+    });
+}
+
+// Bulk Actions Functions
+function toggleSelectAll(checkbox) {
+    const checkboxes = document.querySelectorAll('.question-checkbox');
+    checkboxes.forEach(cb => cb.checked = checkbox.checked);
+    updateBulkActions();
+}
+
+function updateBulkActions() {
+    const checkboxes = document.querySelectorAll('.question-checkbox:checked');
+    const count = checkboxes.length;
+    const bulkBar = document.getElementById('bulk-actions-bar');
+    const selectedCount = document.getElementById('selected-count');
+    
+    if (count > 0) {
+        bulkBar.style.display = 'block';
+        selectedCount.textContent = count;
+    } else {
+        bulkBar.style.display = 'none';
+    }
+}
+
+function clearSelection() {
+    document.querySelectorAll('.question-checkbox').forEach(cb => cb.checked = false);
+    document.getElementById('select-all').checked = false;
+    updateBulkActions();
+}
+
+function editFolder(folderId, name, description, color, icon) {
+    // Populate edit modal with folder data
+    document.getElementById('edit-folder-id').value = folderId;
+    document.getElementById('edit-folder-name').value = name;
+    document.getElementById('edit-folder-description').value = description;
+    document.getElementById('edit-folder-color').value = color;
+    document.getElementById('edit-folder-icon').value = icon;
+    
+    // Show edit modal
+    const modal = new bootstrap.Modal(document.getElementById('editFolderModal'));
+    modal.show();
+}
+
+function deleteFolder(folderId, folderName) {
+    if (!confirm(`Are you sure you want to delete the folder "${folderName}"?\n\nThis will not delete the questions, only the folder organization.`)) {
+        return;
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch(`/questions/folders/${folderId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Folder deleted successfully');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to delete folder'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to delete folder');
+    });
+}
+
+function submitEditFolder() {
+    const folderId = document.getElementById('edit-folder-id').value;
+    const formData = new FormData(document.getElementById('editFolderForm'));
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch(`/questions/folders/${folderId}/edit/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Folder updated successfully');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to update folder'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update folder');
+    });
+}
+
+// Show folder actions on hover
+document.addEventListener('DOMContentLoaded', function() {
+    // Set folder icon colors from data attributes
+    document.querySelectorAll('.folder-icon[data-color]').forEach(icon => {
+        if (!icon.classList.contains('active-icon')) {
+            icon.style.color = icon.getAttribute('data-color');
+        }
+    });
+    
+    // Folder hover actions
+    document.querySelectorAll('.folder-item').forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            const actions = this.querySelector('.folder-actions');
+            if (actions) actions.style.opacity = '1';
+        });
+        item.addEventListener('mouseleave', function() {
+            const actions = this.querySelector('.folder-actions');
+            if (actions) actions.style.opacity = '0';
+        });
+    });
+    
+    // Folder action button handlers
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-folder-action');
+        if (!btn) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const action = btn.dataset.action;
+        const folderId = btn.dataset.folderId;
+        const folderName = btn.dataset.folderName;
+        
+        if (action === 'edit') {
+            editFolder(
+                folderId, 
+                folderName, 
+                btn.dataset.folderDescription, 
+                btn.dataset.folderColor, 
+                btn.dataset.folderIcon
+            );
+        } else if (action === 'delete') {
+            deleteFolder(folderId, folderName);
+        }
+    });
+});
+</script>
+
+<style>
+.folder-item {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.folder-item:hover {
+    background: #f0f4ff;
+    transform: translateX(3px);
+}
+
+.folder-item:hover .folder-actions {
+    opacity: 1 !important;
+}
+
+.folder-item a {
+    display: block;
+    width: 100%;
+}
+
+.folder-link {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+
+.folder-link.active {
+    background: #f0f4ff;
+}
+
+.folder-link-a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.folder-name {
+    font-weight: 500;
+}
+
+.folder-tree-item {
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 3px;
+    position: relative;
+}
+
+.folder-tree-item.active.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.folder-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.folder-link-tree {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    color: #333;
+    font-weight: 500;
+}
+
+.folder-link-tree.active-link {
+    color: white;
+}
+
+.folder-icon {
+    transition: color 0.2s;
+}
+
+.folder-icon.active-icon {
+    color: white !important;
+}
+
+.folder-text {
+    flex: 1;
+}
+
+.folder-badge {
+    background: #f0f0f0;
+    color: #667eea;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.folder-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.btn-folder-action {
+    background: none;
+    border: none;
+    padding: 2px 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-edit-folder {
+    color: #667eea;
+}
+
+.btn-delete-folder {
+    color: #dc3545;
+}
+
+.btn-folder-action.active-btn {
+    color: white;
+}
+
+.btn-folder-action:hover {
+    transform: scale(1.2);
+}
+
+.folder-children {
+    margin-left: 20px;
+    margin-top: 5px;
+}
+
+.question-checkbox,
+#select-all {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+/* Dashboard content wrapper with sidebar */
+.dashboard-content-wrapper {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+}
+
+.folder-sidebar {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.folder-panel {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.breadcrumb-card {
+    margin-bottom: 15px;
+    padding: 12px 20px;
+}
+
+.bulk-actions-bar {
+    display: none;
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    margin-bottom: 20px;
+}
+
+.bulk-actions-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.bulk-actions-label {
+    font-weight: 500;
+}
+
+.bulk-actions-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.bulk-folder-select {
+    width: 200px;
+}
+
+.badge-subject {
+    background: #e8f4f8;
+    color: #667eea;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.badge-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-warning {
+    background: #fff3cd;
+    color: #856404;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-danger {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead tr {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.data-table th,
+.data-table td {
+    padding: 15px;
+    text-align: left;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.data-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.question-text {
+    font-weight: 500;
+    color: #333;
+}
+
+@media (max-width: 992px) {
+    .dashboard-content-wrapper {
+        grid-template-columns: 1fr;
+    }
+    
+    .folder-sidebar {
+        position: static;
+    }
+}
+</style>
+
+<script>
+// Apply tag colors dynamically to avoid CSS linting errors
+document.addEventListener('DOMContentLoaded', function() {
+    // Apply colors to filter pills
+    document.querySelectorAll('.tag-filter-pill[data-tag-color]').forEach(pill => {
+        const color = pill.dataset.tagColor;
+        pill.style.backgroundColor = color;
+        // Apply opacity to inactive pills
+        if (pill.classList.contains('inactive')) {
+            pill.style.opacity = '0.7';
+        }
+    });
+    
+    // Apply colors to tag badges
+    document.querySelectorAll('.tag-badge[data-tag-color]').forEach(badge => {
+        badge.style.backgroundColor = badge.dataset.tagColor;
+    });
+});
+</script>
 {% endblock %}

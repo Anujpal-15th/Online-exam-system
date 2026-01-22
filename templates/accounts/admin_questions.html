@@ -1,0 +1,143 @@
+{% extends 'dashboards/admin_base.html' %}
+{% block title %}All Questions{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-question-circle"></i> All Questions</h1>
+</div>
+
+<!-- Folder Filter & Search Bar -->
+<div class="custom-card" style="margin-bottom: 20px;">
+    <form method="GET" action="">
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+            <input type="text" name="search" value="{{ search_query }}" 
+                   placeholder="Search by question text, subject, or teacher..." 
+                   class="form-input" style="flex: 1;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Search
+            </button>
+            {% if search_query %}
+            <a href="{% url 'admin_questions' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Clear
+            </a>
+            {% endif %}
+        </div>
+        
+        <!-- Folder Filter -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <label style="min-width: 120px;"><i class="fas fa-folder"></i> Filter by Folder:</label>
+            <select name="folder" class="form-select" style="flex: 1;" onchange="this.form.submit()">
+                <option value="">All Questions</option>
+                {% include 'questions/partials/folder_options.html' with folders=folders current_folder=current_folder %}
+            </select>
+            {% if current_folder %}
+            <a href="{% url 'admin_questions' %}{% if search_query %}?search={{ search_query }}{% endif %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Clear Filter
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Questions Table -->
+<div class="custom-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: #667eea; margin: 0;">
+            <i class="fas fa-list"></i> Question Bank 
+            <span class="badge badge-primary">{{ questions.count }}</span>
+        </h3>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> ID</th>
+                    <th><i class="fas fa-question"></i> Question</th>
+                    <th><i class="fas fa-user"></i> Created By</th>
+                    <th><i class="fas fa-book"></i> Subject</th>
+                    <th><i class="fas fa-signal"></i> Difficulty</th>
+                    <th><i class="fas fa-layer-group"></i> Type</th>
+                    <th><i class="fas fa-calendar"></i> Created</th>
+                    <th class="text-center"><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in questions %}
+                <tr>
+                    <td><strong>#{{ q.id }}</strong></td>
+                    <td>
+                        <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                            {{ q.question_text|truncatewords:10 }}
+                        </div>
+                    </td>
+                    <td>
+                        <strong>{{ q.author.username }}</strong>
+                        <br>
+                        <small style="color: #999;">{{ q.author.email }}</small>
+                    </td>
+                    <td>
+                        {% if q.subject %}
+                            <span class="badge badge-info">{{ q.subject }}</span>
+                        {% else %}
+                            <span class="badge badge-secondary">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if q.difficulty == 'easy' %}
+                            <span class="badge badge-success">Easy</span>
+                        {% elif q.difficulty == 'medium' %}
+                            <span class="badge badge-warning">Medium</span>
+                        {% elif q.difficulty == 'hard' %}
+                            <span class="badge badge-danger">Hard</span>
+                        {% else %}
+                            <span class="badge badge-secondary">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if q.type == 'mcq' %}
+                            <span class="badge badge-type-mcq">MCQ</span>
+                        {% elif q.type == 'tf' %}
+                            <span class="badge badge-type-tf">True/False</span>
+                        {% elif q.type == 'short' %}
+                            <span class="badge badge-type-short">Short Answer</span>
+                        {% elif q.type == 'essay' %}
+                            <span class="badge badge-type-essay">Essay</span>
+                        {% else %}
+                            <span class="badge badge-secondary">{{ q.type|upper }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ q.created_at|date:"M d, Y" }}</td>
+                    <td class="text-center">
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <a href="{% url 'edit_question' q.id %}" class="btn btn-sm btn-info" title="View/Edit Question">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <form method="POST" action="{% url 'admin_delete_question' q.id %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this question? This action cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" title="Delete Question">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center" style="padding: 40px; color: #999;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <p>
+                            {% if search_query %}
+                                No questions found matching "{{ search_query }}"
+                            {% else %}
+                                No questions available yet
+                            {% endif %}
+                        </p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

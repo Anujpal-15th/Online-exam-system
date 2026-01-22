@@ -1,0 +1,23 @@
+Hello {{ student.get_full_name }},
+
+Your test has been graded!
+
+Test: {{ test.title }}
+Score: {{ attempt.total_score }}/{{ test.total_marks }}
+Percentage: {{ percentage }}%
+Status: {{ status }}
+
+{% if attempt.submitted_at %}
+Submitted on: {{ attempt.submitted_at|date:"F d, Y - g:i A" }}
+{% endif %}
+
+Log in to {{ site_name }} to view your detailed results and feedback.
+
+{% if status == 'Passed' %}
+Congratulations on passing the test! 🎉
+{% else %}
+Keep working hard! You can do better next time.
+{% endif %}
+
+Best regards,
+The {{ site_name }} Team

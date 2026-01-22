@@ -1,0 +1,49 @@
+{% extends 'dashboards/student_base.html' %}
+{% block title %}My Certificates{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-certificate"></i> My Certificates</h1>
+</div>
+    
+{% if certificates %}
+<div class="card-grid">
+        {% for cert in certificates %}
+        <div style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 15px; padding: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -20px; right: -20px; font-size: 8rem; opacity: 0.1;">
+                <i class="fas fa-certificate"></i>
+            </div>
+            <div style="position: relative; z-index: 1;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 1.3rem;">{{ cert.test.title }}</h3>
+                <p style="color: #666; margin-bottom: 8px;">
+                    <i class="fas fa-user"></i> {{ cert.student.username }}
+                </p>
+                <p style="color: #666; margin-bottom: 8px;">
+                    <i class="fas fa-calendar"></i> Issued: {{ cert.issued_date|date:"M d, Y" }}
+                </p>
+                <p style="color: #666; margin-bottom: 8px;">
+                    <i class="fas fa-percent"></i> Score: {{ cert.score_percentage|floatformat:2 }}%
+                </p>
+                <p style="color: #666; margin-bottom: 20px;">
+                    <i class="fas fa-id-card"></i> Code: <strong>{{ cert.certificate_code }}</strong>
+                </p>
+                <div style="text-align: center;">
+                    <span style="background: white; color: #d35400; padding: 10px 20px; border-radius: 25px; font-weight: 700; font-size: 1.1rem; display: inline-block;">
+                        <i class="fas fa-award"></i> CERTIFIED
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-certificate fa-4x"></i>
+    <p>No certificates earned yet. Complete tests to earn certificates!</p>
+</div>
+{% endif %}
+
+<div style="margin-top: 30px;">
+    <a href="{% url 'student_dashboard' %}" class="back-link">← Back to Dashboard</a>
+</div>
+{% endblock %}

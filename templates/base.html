@@ -2,197 +2,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}Online Exam System{% endblock %}</title>
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <style>
-        /* Reset and Body */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        main {
-          max-width: 100% !important; /* override any previous max-width */
-          margin: 0 !important;       /* remove auto-centering */
-          padding: 20px;              /* optional spacing */
-          text-align: left !important;
-      }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Navbar */
-        .navbar-nav .nav-item .nav-link {
-            font-size: 0.85rem;
-            transition: color 0.2s ease;
-            position: relative;
-            padding-bottom: 4px;
-        }
-
-        /* Underline effect */
-        .navbar-nav .nav-item .nav-link::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            height: 2px;
-            width: 0;
-            background-color: #ffd700;
-            transition: width 0.3s ease-in-out;
-        }
-
-        .navbar-nav .nav-item .nav-link:hover::after,
-        .navbar-nav .nav-item .nav-link.active::after {
-            width: 100%;
-        }
-
-        
-        /* Spacing and colors */
-        .navbar-nav .nav-item {
-            margin-left: 5px;
-            margin-right: 5px;
-        }
-
-        .navbar-nav .nav-item {
-            margin-left: 5px;
-            margin-right: 5px;
-        }
-        .navbar {
-            background: linear-gradient(90deg, #007bff, #0056b3);
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: #fff !important;
-            font-size: 1.4rem;
-        }
-        .nav-link {
-            color: #fff !important;
-            font-weight: 500;
-        }
-        .nav-link:hover, .dropdown-item:hover {
-            color: #ffd700 !important;
-        }
-        .dropdown-menu {
-            border-radius: 10px;
-        }
-        
-
-        /* Main content container */
-        main {
-            flex-grow: 1;
-            padding: 40px 20px;
-            max-width: 900px;
-            margin: auto;
-        }
-
-        /* Footer */
-        footer {
-            background: linear-gradient(90deg, #007bff, #0056b3);
-            color: white;
-            text-align: center;
-            padding: 12px 0;
-            font-size: 0.9rem;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
-            margin-top: auto;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EduExam{% endblock %}</title>
+    
+    <!-- External Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CENTRALIZED CSS - Single import for entire theme -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    
+    <!-- Responsive CSS for all devices -->
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    
+    <!-- Page-specific CSS (if needed) -->
+    {% block extra_css %}{% endblock %}
 </head>
+
 <body>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'dashboard_home' %}">Online Exam System</a>
-    <a class="navbar-brand" href="{% if user.is_authenticated %}
-                                    {% if user.user_type == 1 %}/admin/dashboard/
-                                    {% elif user.user_type == 2 %}/teacher/dashboard/
-                                    {% elif user.user_type == 3 %}/student/dashboard/
-                                    {% else %}/{% endif %}
-                                    {% else %}/{% endif %}">
-    </a>
-
-
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <!-- Top Navigation -->
+    <nav class="main-navbar">
         {% if user.is_authenticated %}
-            {% if user.user_type == 1 %}
-                <!-- Admin Links -->
-                <li class="nav-item"><a class="nav-link" href="{% url 'questions_list' %}">Manage Questions</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'admin_users' %}">Manage Users</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'admin_activity' %}">Reports</a></li>
+            {% if user.user_type == 3 %}
+                <a href="{% url 'student_dashboard' %}" class="navbar-brand">
             {% elif user.user_type == 2 %}
-                <!-- Teacher Links -->
-                <li class="nav-item"><a class="nav-link" href="{% url 'questions_list' %}">Manage Questions</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'submissions_list' %}">All Submissions</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'teacher_reports' %}">Performance Reports</a></li>
-            {% elif user.user_type == 3 %}
-                <!-- Student Links -->
-                <li class="nav-item"><a class="nav-link" href="{% url 'leaderboard' %}">Leaderboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'questions_list' %}">Browse Questions</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'student_submissions' %}">My Submissions</a></li>
+                <a href="{% url 'teacher_dashboard' %}" class="navbar-brand">
+            {% elif user.user_type == 1 or user.is_staff %}
+                <a href="{% url 'admin_dashboard' %}" class="navbar-brand">
+            {% else %}
+                <a href="/" class="navbar-brand">
             {% endif %}
         {% else %}
-            <!-- Non-authenticated Links -->
-            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+            <a href="/" class="navbar-brand">
         {% endif %}
-      </ul>
-
-      {% if user.is_authenticated %}
-<ul class="navbar-nav mb-2 mb-lg-0">
-  <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fa-solid fa-user-circle fa-2x me-2"></i>
-      {{ user.username }}
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-      <li>
-        <a class="dropdown-item d-flex align-items-center" href="#">
-          <i class="fa-solid fa-id-card me-2"></i>Profile
+            <i class="fas fa-graduation-cap"></i>
+            {% block portal_title %}EduExam{% endblock %}
         </a>
-      </li>
-      <li><hr class="dropdown-divider"></li>
-      <li>
-        <a class="dropdown-item d-flex align-items-center text-danger" href="{% url 'logout' %}">
-          <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
-        </a>
-      </li>
-    </ul>
-  </li>
-</ul>
-{% endif %}
-
-    </div>
-  </div>
-</nav>
-
-<!-- Main Content -->
-<main>
-    {% block content %}
-    {% endblock %}
-</main>
-
-<!-- Footer -->
-<footer>
-    <small>&copy; {{ now|date:"Y" }} Online Exam System. All Rights Reserved.</small>
-</footer>
-
-<!-- Bootstrap JS Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="navbar-actions">
+            {% if user.is_authenticated %}
+                {% if user.user_type == 3 %}
+                <a href="{% url 'students:notifications' %}" class="notification-bell" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+                {% elif user.user_type == 2 %}
+                <a href="{% url 'teacher_notifications' %}" class="notification-bell" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+                {% elif user.user_type == 1 or user.is_staff %}
+                <a href="{% url 'admin_notifications' %}" class="notification-bell" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+                {% endif %}
+                
+                <div class="profile-dropdown">
+                    <button class="profile-dropdown-toggle">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ user.username }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="profile-dropdown-menu">
+                        <a href="{% url 'profile' %}" class="dropdown-item">
+                            <i class="fas fa-user"></i> Profile
+                        </a>
+                        <a href="{% url 'logout' %}" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-white">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        {% block sidebar %}
+        <!-- Default sidebar content -->
+        <div class="sidebar-section">
+            <h3 class="sidebar-section-title">
+                <i class="fas fa-bars"></i> Menu
+            </h3>
+        </div>
+        {% endblock %}
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Profile Dropdown Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            const profileToggle = document.querySelector('.profile-dropdown-toggle');
+            const profileMenu = document.querySelector('.profile-dropdown-menu');
+            
+            if (profileToggle && profileMenu) {
+                // Toggle dropdown on click
+                profileToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Toggle the menu visibility
+                    if (profileMenu.style.display === 'block') {
+                        profileMenu.style.display = 'none';
+                    } else {
+                        profileMenu.style.display = 'block';
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!profileDropdown.contains(e.target)) {
+                        profileMenu.style.display = 'none';
+                    }
+                });
+                
+                // Prevent menu from closing when clicking inside
+                profileMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+            
+            // Mobile sidebar toggle
+            const sidebar = document.querySelector('.dashboard-sidebar');
+            if (sidebar) {
+                // Create mobile menu button
+                const mobileMenuBtn = document.createElement('button');
+                mobileMenuBtn.className = 'mobile-menu-btn';
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                mobileMenuBtn.setAttribute('aria-label', 'Toggle menu');
+                
+                // Create overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'sidebar-overlay';
+                
+                // Insert button and overlay
+                const navbar = document.querySelector('.main-navbar');
+                if (navbar && window.innerWidth <= 768) {
+                    navbar.insertBefore(mobileMenuBtn, navbar.firstChild);
+                    document.body.insertBefore(overlay, sidebar);
+                    
+                    // Toggle functionality
+                    mobileMenuBtn.addEventListener('click', function() {
+                        sidebar.classList.toggle('show');
+                        overlay.classList.toggle('show');
+                    });
+                    
+                    overlay.addEventListener('click', function() {
+                        sidebar.classList.remove('show');
+                        overlay.classList.remove('show');
+                    });
+                    
+                    // Close on link click
+                    const sidebarLinks = sidebar.querySelectorAll('.sidebar-link');
+                    sidebarLinks.forEach(link => {
+                        link.addEventListener('click', function() {
+                            if (window.innerWidth <= 768) {
+                                sidebar.classList.remove('show');
+                                overlay.classList.remove('show');
+                            }
+                        });
+                    });
+                }
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

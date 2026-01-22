@@ -1,0 +1,103 @@
+{% extends 'dashboards/admin_base.html' %}
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-users"></i> User Management</h1>
+</div>
+
+<div class="custom-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: #667eea; margin: 0;"><i class="fas fa-list"></i> All Users</h3>
+        <a href="{% url 'admin_create_user' %}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Create New User
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th><i class="fas fa-hashtag"></i> ID</th>
+                    <th><i class="fas fa-user"></i> Username</th>
+                    <th><i class="fas fa-envelope"></i> Email</th>
+                    <th><i class="fas fa-id-badge"></i> Role</th>
+                    <th class="text-center"><i class="fas fa-toggle-on"></i> Status</th>
+                    <th><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr {% if u.is_blocked %}style="opacity: 0.6; background-color: #fff3cd;"{% endif %}>
+                    <td><strong>#{{ u.id }}</strong></td>
+                    <td>
+                        {{ u.username }}
+                        {% if u.is_blocked %}
+                            <i class="fas fa-ban text-danger" title="Blocked"></i>
+                        {% endif %}
+                    </td>
+                    <td>{{ u.email }}</td>
+                    <td>
+                        {% if u.user_type == 1 %}
+                            <span class="badge bg-danger">Admin</span>
+                        {% elif u.user_type == 2 %}
+                            <span class="badge bg-primary">Teacher</span>
+                        {% elif u.user_type == 3 %}
+                            <span class="badge bg-success">Student</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if u.is_blocked %}
+                            <span class="badge" style="background: #dc3545; color: white;">
+                                <i class="fas fa-ban"></i> Blocked
+                            </span>
+                        {% else %}
+                            <span class="badge" style="background: #28a745; color: white;">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.id != user.id %}
+                        <div style="display: flex; gap: 5px;">
+                            <!-- Block/Unblock Button -->
+                            <form method="POST" action="{% url 'admin_block_user' u.id %}" style="display:inline;" 
+                                  onsubmit="return confirm('{% if u.is_blocked %}Unblock{% else %}Block{% endif %} user {{ u.username }}?');">
+                                {% csrf_token %}
+                                {% if u.is_blocked %}
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="fas fa-unlock"></i> Unblock
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-ban"></i> Block
+                                    </button>
+                                {% endif %}
+                            </form>
+                            
+                            <!-- Delete Button -->
+                            <form method="POST" action="{% url 'admin_delete_user' u.id %}" style="display:inline;" 
+                                  onsubmit="return confirm('Are you sure you want to permanently delete user {{ u.username }}? This action cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                        {% else %}
+                            <span class="badge bg-secondary">Current User</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted p-4">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <p>No users found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

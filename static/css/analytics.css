@@ -1,0 +1,134 @@
+/* ============================================
+   STUDENT ANALYTICS DASHBOARD STYLES
+   ============================================ */
+
+/* Override for canvas containers */
+.custom-card .card-body canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Ensure charts are responsive */
+.custom-card .card-body {
+    position: relative;
+}
+
+/* Loading Spinner for Charts */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+}
+
+.loading-spinner .spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 0.25rem solid rgba(0,0,0,0.1);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Chart Error State */
+.chart-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+    color: #dc3545;
+}
+
+/* Empty State for Analytics */
+.analytics-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.analytics-empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Insight Cards Hover Effect */
+.custom-card .card-body .bg-light.rounded {
+    transition: all 0.3s ease;
+}
+
+.custom-card .card-body .bg-light.rounded:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .custom-card .card-body {
+        height: 300px !important;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Chart Tooltips Enhancement */
+.chartjs-tooltip {
+    opacity: 1 !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-radius: 4px !important;
+    color: white !important;
+    padding: 8px 12px !important;
+}
+
+/* Performance Trend Badge */
+.custom-card .badge {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Chart Container Spacing */
+.row.g-3 {
+    margin-top: 0 !important;
+}
+
+/* Stat Card Icons */
+.stat-card i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Insight Icons */
+.custom-card .card-body .bg-light i {
+    display: block;
+}
+
+/* Print Styles */
+@media print {
+    .custom-card {
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card {
+        border: 1px solid #dee2e6;
+    }
+}

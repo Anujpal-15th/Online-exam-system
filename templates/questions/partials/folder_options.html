@@ -1,0 +1,19 @@
+{% for folder in folders %}
+    <option value="{{ folder.id }}" {% if current_folder and current_folder.id == folder.id %}selected{% endif %}>
+        {{ folder.name }} ({{ folder.get_question_count }})
+    </option>
+    {% if folder.subfolders.all %}
+        {% for subfolder in folder.subfolders.all %}
+            <option value="{{ subfolder.id }}" {% if current_folder and current_folder.id == subfolder.id %}selected{% endif %}>
+                &nbsp;&nbsp;└─ {{ subfolder.name }} ({{ subfolder.get_question_count }})
+            </option>
+            {% if subfolder.subfolders.all %}
+                {% for subsubfolder in subfolder.subfolders.all %}
+                    <option value="{{ subsubfolder.id }}" {% if current_folder and current_folder.id == subsubfolder.id %}selected{% endif %}>
+                        &nbsp;&nbsp;&nbsp;&nbsp;└─ {{ subsubfolder.name }} ({{ subsubfolder.get_question_count }})
+                    </option>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endfor %}

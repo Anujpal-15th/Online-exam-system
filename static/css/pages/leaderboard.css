@@ -1,0 +1,82 @@
+/* ============================================
+   LEADERBOARD PAGE STYLES
+   ============================================ */
+
+.leaderboard-row {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.leaderboard-row.current-user {
+    background: #fff3cd;
+}
+
+.leaderboard-row td {
+    padding: 15px;
+}
+
+.leaderboard-row .rank-cell {
+    font-weight: 600;
+}
+
+.leaderboard-row .student-name.current-user {
+    font-weight: 700;
+    color: #667eea;
+}
+
+/* Leaderboard table */
+.leaderboard-table {
+    width: 100%;
+}
+
+.leaderboard-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.leaderboard-table th {
+    padding: 15px;
+    text-align: left;
+}
+
+.leaderboard-table th:first-child {
+    border-radius: 8px 0 0 0;
+}
+
+.leaderboard-table th:last-child {
+    border-radius: 0 8px 0 0;
+}
+
+.leaderboard-table tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.leaderboard-table td {
+    padding: 12px;
+}
+
+.leaderboard-table .rank-icon-gold {
+    color: #f6b93b;
+}
+
+.leaderboard-table .rank-icon-silver {
+    color: #c0c0c0;
+}
+
+.leaderboard-table .rank-icon-bronze {
+    color: #cd7f32;
+}
+
+.leaderboard-table .you-badge {
+    color: #667eea;
+    font-size: 0.85rem;
+}
+
+.leaderboard-table .avg-score {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.leaderboard-container {
+    max-width: 900px;
+    margin: 0 auto;
+}

@@ -1,49 +1,144 @@
-{% extends 'base.html' %}
+{% extends 'dashboards/student_base.html' %}
 {% load static %}
+
 {% block title %}Student Dashboard{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <!-- Welcome Section -->
+    <div class="page-header">
+        <h1 class="page-title">Welcome back, {{ user.username }}! 👋</h1>
+        <p class="text-muted">Ready to ace your exams? Let's get started!</p>
+    </div>
 
-<div class="dashboard-container">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-clipboard-check text-primary"></i>
+            <h3 class="stat-value">{{ total_tests_taken }}</h3>
+            <p class="stat-label">Tests Completed</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-trophy text-warning"></i>
+            <h3 class="stat-value">{% if student_rank %}#{{ student_rank }}{% else %}N/A{% endif %}</h3>
+            <p class="stat-label">Leaderboard Rank</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-star text-danger"></i>
+            <h3 class="stat-value">{% if student_avg_score %}{{ student_avg_score|floatformat:1 }}{% else %}N/A{% endif %}</h3>
+            <p class="stat-label">Average Score</p>
+        </div>
+        <div class="stat-card" style="cursor: pointer;" onclick="window.location.href='{% url 'students:analytics' %}'">
+            <i class="fas fa-chart-area text-info"></i>
+            <h3 class="stat-value"><i class="fas fa-arrow-right" style="font-size: 1.5rem;"></i></h3>
+            <p class="stat-label">View Analytics</p>
+        </div>
+    </div>
 
-  <!-- Sidebar -->
-  <div class="dashboard-sidebar">
-    <h2>Student Dashboard</h2>
-    <a href="{% url 'questions_list' %}">Browse Questions</a>
-    <a href="{% url 'student_submissions' %}">My Submissions</a>
-    <a href="{% url 'logout' %}">Logout</a>
-  </div>
+    <!-- Upcoming Exams -->
+    <div class="custom-card">
+        <div class="card-header-section">
+            <h3 class="card-section-title"><i class="fas fa-calendar-alt"></i> Upcoming Exams</h3>
+            <a href="{% url 'student_all_exams' %}" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+            {% if upcoming_tests %}
+            <div class="card-grid">
+                {% for test in upcoming_tests %}
+                <div class="card card-hover">
+                    <h4>{{ test.title }}</h4>
+                    <p class="text-muted">
+                        <i class="fas fa-book"></i> {{ test.subject|default:"General" }}
+                    </p>
+                    <p class="text-muted">
+                        <i class="fas fa-clock"></i> {{ test.duration_minutes }} minutes
+                    </p>
+                    {% if test.start_at %}
+                    <p class="text-muted">
+                        <i class="fas fa-calendar"></i> {{ test.start_at|date:"M d, Y h:i A" }}
+                    </p>
+                    {% endif %}
+                    <a href="{% url 'start_test' test.id %}" class="btn btn-primary mt-3">Start Test</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>No upcoming exams at the moment.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
-  <!-- Main content -->
-  <div class="dashboard-main">
-    <h2>Student Dashboard</h2>
-    <h1>Welcome, {{ user.username }}!</h1>
+    <!-- Recent Results -->
+    <div class="custom-card">
+        <div class="card-header-section">
+            <h3 class="card-section-title"><i class="fas fa-chart-bar"></i> Recent Results</h3>
+            <a href="{% url 'student_results' %}" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="table-responsive">
+            {% if recent_attempts %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Date</th>
+                        <th>Score</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attempt in recent_attempts %}
+                    <tr>
+                        <td>{{ attempt.test.title }}</td>
+                        <td>{{ attempt.submitted_at|date:"M d, Y" }}</td>
+                        <td class="text-center">
+                            {% if attempt.total_score is not None %}
+                            <span class="badge badge-{% if attempt.total_score >= 80 %}success{% elif attempt.total_score >= 50 %}warning{% else %}danger{% endif %}" style="color: white;">
+                                {{ attempt.total_score }}
+                            </span>
+                            {% else %}
+                            <span class="badge badge-secondary">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'review_test' attempt.id %}" class="btn btn-sm btn-primary">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="table-empty">
+                            <i class="fas fa-inbox"></i>
+                            <p>No results yet. Start taking tests!</p>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <h3>Available Questions</h3>
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Question</th>
-        <th>Subject</th>
-        <th>Topic</th>
-        <th>Difficulty</th>
-        <th>Action</th>
-      </tr>
-      {% for q in questions %}
-      <tr>
-        <td>{{ q.id }}</td>
-        <td>{{ q.question_text }}</td>
-        <td>{{ q.subject }}</td>
-        <td>{{ q.topic }}</td>
-        <td>{{ q.difficulty }}</td>
-        <td><a href="{% url 'take_question' q.id %}">Answer</a></td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="6">No questions available yet.</td></tr>
-      {% endfor %}
-    </table>
-  </div>
-
-</div>
-
+    <!-- Notifications -->
+    <div class="custom-card">
+        <div class="card-header-section">
+            <h3 class="card-section-title"><i class="fas fa-bell"></i> Recent Notifications</h3>
+            <a href="{% url 'students:notifications' %}" class="btn btn-sm btn-primary">View All</a>
+        </div>
+            {% if unread_notifications %}
+            {% for notification in unread_notifications %}
+            <div class="alert alert-info">
+                <h5>{{ notification.title }}</h5>
+                <p>{{ notification.message }}</p>
+                <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-bell-slash"></i>
+                <p>No new notifications.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

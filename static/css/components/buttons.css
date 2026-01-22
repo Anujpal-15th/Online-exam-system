@@ -1,0 +1,396 @@
+/**
+ * ============================================================================
+ * BUTTON COMPONENTS
+ * ============================================================================
+ * 
+ * All button styles for the application.
+ * Use these classes consistently instead of creating custom button styles.
+ * 
+ * Available Button Types:
+ * - .btn-primary     : Main action buttons (purple gradient)
+ * - .btn-secondary   : Secondary actions (gray)
+ * - .btn-success     : Success/confirm actions (green)
+ * - .btn-warning     : Warning actions (orange)
+ * - .btn-danger      : Delete/destructive actions (red)
+ * - .btn-outline     : Outlined buttons (transparent with border)
+ * - .btn-ghost       : Ghost buttons (minimal styling)
+ * 
+ * Button Sizes:
+ * - .btn-sm          : Small button
+ * - .btn (default)   : Normal button
+ * - .btn-lg          : Large button
+ * 
+ * Button States:
+ * - .btn-block       : Full width button
+ * - :disabled        : Disabled state
+ * ============================================================================
+ */
+
+/* ============================================================================
+   BASE BUTTON STYLES - MODERN PROFESSIONAL DESIGN
+   ============================================================================ */
+
+.btn {
+    /* Layout */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    
+    /* Spacing - Reduced for professional look */
+    padding: 10px 20px;
+    
+    /* Typography */
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    
+    /* Appearance */
+    border: var(--border-width-thin) solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    
+    /* Transitions */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Remove default styles */
+    text-decoration: none;
+    background: none;
+}
+
+.btn:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.btn-sm {
+    padding: 7px 14px;
+    font-size: 0.813rem;
+}
+
+/* ============================================================================
+   PRIMARY BUTTONS - Main actions - PROFESSIONAL DESIGN
+   ============================================================================ */
+
+.btn-primary,
+.btn-primary-custom {  /* Legacy class support */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+    font-weight: 500;
+}
+
+.btn-primary:hover,
+.btn-primary-custom:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:active,
+.btn-primary-custom:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+}
+
+.btn-primary:disabled,
+.btn-primary-custom:disabled {
+    background: #e5e7eb;
+    color: #666666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ============================================================================
+   SECONDARY BUTTONS - Alternative actions
+   ============================================================================ */
+
+.btn-secondary {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-700);
+    border: var(--border-width-thin) solid var(--color-gray-300);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-gray-200);
+    border-color: var(--color-gray-400);
+}
+
+.btn-secondary:active {
+    background-color: var(--color-gray-300);
+}
+
+.btn-secondary:disabled {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-400);
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   SUCCESS BUTTONS - Confirm, submit actions
+   ============================================================================ */
+
+.btn-success {
+    background-color: var(--color-success);
+    color: var(--color-white);
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: var(--color-success-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-success:active {
+    transform: translateY(0);
+}
+
+.btn-success:disabled {
+    background-color: var(--color-gray-300);
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   WARNING BUTTONS - Caution actions
+   ============================================================================ */
+
+.btn-warning {
+    background-color: var(--color-warning);
+    color: var(--color-white);
+    border: none;
+}
+
+.btn-warning:hover {
+    background-color: var(--color-warning-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-warning:active {
+    transform: translateY(0);
+}
+
+.btn-warning:disabled {
+    background-color: var(--color-gray-300);
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   DANGER BUTTONS - Delete, destructive actions
+   ============================================================================ */
+
+.btn-danger {
+    background-color: var(--color-error);
+    color: var(--color-white);
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: var(--color-error-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+}
+
+.btn-danger:disabled {
+    background-color: var(--color-gray-300);
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   OUTLINE BUTTONS - Less prominent actions
+   ============================================================================ */
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: var(--border-width-thin) solid var(--color-primary);
+}
+
+.btn-outline:hover {
+    background-color: var(--color-primary-lighter);
+    border-color: var(--color-primary-dark);
+}
+
+.btn-outline:active {
+    background-color: var(--color-primary-light);
+}
+
+.btn-outline:disabled {
+    color: var(--color-gray-400);
+    border-color: var(--color-gray-300);
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   GHOST BUTTONS - Minimal styling
+   ============================================================================ */
+
+.btn-ghost {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: none;
+}
+
+.btn-ghost:hover {
+    background-color: var(--color-primary-lighter);
+}
+
+.btn-ghost:active {
+    background-color: var(--color-primary-light);
+}
+
+.btn-ghost:disabled {
+    color: var(--color-gray-400);
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   BUTTON SIZES
+   ============================================================================ */
+
+.btn-sm {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+}
+
+.btn-lg {
+    padding: var(--spacing-4) var(--spacing-8);
+    font-size: var(--font-size-lg);
+}
+
+/* ============================================================================
+   BUTTON MODIFIERS
+   ============================================================================ */
+
+/* Full width button */
+.btn-block {
+    display: flex;
+    width: 100%;
+}
+
+/* Button with icon */
+.btn-icon {
+    gap: var(--spacing-2);
+}
+
+.btn-icon i,
+.btn-icon svg {
+    font-size: 1.1em;
+}
+
+/* Icon-only button */
+.btn-icon-only {
+    padding: var(--spacing-3);
+    aspect-ratio: 1;
+}
+
+/* ============================================================================
+   BUTTON GROUPS
+   ============================================================================ */
+
+.btn-group {
+    display: inline-flex;
+    gap: var(--spacing-2);
+}
+
+.btn-group .btn {
+    margin: 0;
+}
+
+/* Attached buttons (no gap) */
+.btn-group-attached {
+    display: inline-flex;
+    gap: 0;
+}
+
+.btn-group-attached .btn:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -1px;
+}
+
+.btn-group-attached .btn:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* ============================================================================
+   ACTION BUTTONS - For table rows and cards
+   ============================================================================ */
+
+/* Action button container */
+.action-buttons {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+/* Individual action button */
+.btn-action {
+    padding: 6px 12px;
+    font-size: 0.813rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+/* Edit action */
+.btn-action-edit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-action-edit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Delete action */
+.btn-action-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+}
+
+.btn-action-delete:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* View/Detail action */
+.btn-action-view {
+    background: #17a2b8;
+    color: white;
+    border: none;
+}
+
+.btn-action-view:hover {
+    background: #138496;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+}
+
+/* Archive action */
+.btn-action-archive {
+    background: #6c757d;
+    color: white;
+    border: none;
+}
+
+.btn-action-archive:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}

@@ -1,0 +1,219 @@
+/**
+ * ============================================================================
+ * SIDEBAR LAYOUT
+ * ============================================================================
+ * 
+ * Side navigation for dashboards (Student, Teacher, Admin).
+ * Fixed position sidebar with navigation sections.
+ * 
+ * Key Classes:
+ * - .dashboard-sidebar      : Main sidebar container
+ * - .sidebar-section        : Navigation section grouping
+ * - .sidebar-link           : Individual navigation links
+ * - .sidebar-link.active    : Active/current page indicator
+ * ============================================================================
+ */
+
+/* ============================================================================
+   MAIN SIDEBAR CONTAINER
+   ============================================================================ */
+
+.dashboard-sidebar {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--navbar-height));
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    overflow-y: auto;
+    padding: 30px 20px;
+    z-index: var(--z-fixed);
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    transition: transform var(--transition-base) var(--ease-out);
+}
+
+/* Smooth scrolling */
+.dashboard-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-track {
+    background: var(--color-gray-50);
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: var(--radius-full);
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-400);
+}
+
+/* ============================================================================
+   SIDEBAR SECTIONS
+   ============================================================================ */
+
+.sidebar-section {
+    padding: 0 var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.sidebar-section:last-child {
+    margin-bottom: 0;
+}
+
+.sidebar-section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    padding: 0;
+    opacity: 0.8;
+}
+
+/* ============================================================================
+   SIDEBAR LINKS
+   ============================================================================ */
+
+.sidebar-link {
+    display: block;
+    color: white;
+    padding: 12px 15px;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+}
+
+.sidebar-link:hover {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    transform: translateX(5px);
+}
+
+.sidebar-link.active {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    transform: translateX(5px);
+}
+
+.sidebar-link i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-section {
+    margin-bottom: 25px;
+}
+
+
+
+.sidebar-badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: auto;
+}
+
+.sidebar-link.active .sidebar-badge {
+    background: rgba(255,255,255,0.5);
+}
+
+/* ============================================================================
+   SIDEBAR COLLAPSE (Optional feature)
+   ============================================================================ */
+
+.sidebar-collapse-btn {
+    position: absolute;
+    bottom: var(--spacing-4);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-gray-100);
+    border: var(--border-width-thin) solid var(--color-gray-200);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-all);
+}
+
+.sidebar-collapse-btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+}
+
+/* Collapsed State */
+.dashboard-sidebar.collapsed {
+    width: var(--sidebar-width-collapsed);
+}
+
+.dashboard-sidebar.collapsed .sidebar-section-title,
+.dashboard-sidebar.collapsed .sidebar-link span {
+    display: none;
+}
+
+.dashboard-sidebar.collapsed .sidebar-link {
+    justify-content: center;
+}
+
+.dashboard-sidebar.collapsed .sidebar-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 16px;
+    height: 16px;
+    padding: 0;
+    font-size: 10px;
+}
+
+/* ============================================================================
+   MOBILE SIDEBAR
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .dashboard-sidebar {
+        position: fixed;
+        left: 0;
+        top: var(--navbar-height, 60px);
+        transform: translateX(-100%);
+        z-index: 999;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .dashboard-sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .sidebar-link {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    .sidebar-section-title {
+        padding: 10px 20px;
+        font-size: 11px;
+    }
+}
+
+/* ============================================================================
+   LEGACY SUPPORT
+   ============================================================================ */
+
+.dashboard-sidebar a {
+    /* Override default link styles when inside sidebar */
+    color: inherit;
+}

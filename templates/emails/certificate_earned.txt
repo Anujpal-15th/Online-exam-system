@@ -1,0 +1,16 @@
+Hello {{ student.get_full_name }},
+
+Congratulations! You've earned a certificate!
+
+Test: {{ test.title }}
+Score: {{ attempt.total_score }}/{{ test.total_marks }}
+Issued on: {{ certificate.issued_date|date:"F d, Y" }}
+
+Your certificate is now available for download.
+
+Log in to {{ site_name }} to download your certificate.
+
+Well done!
+
+Best regards,
+The {{ site_name }} Team

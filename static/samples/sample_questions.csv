@@ -1,0 +1,6 @@
+type,question_text,options,correct,subject,topic,difficulty
+mcq_single,Which gas is most abundant in Earth's atmosphere?,Oxygen|Nitrogen|Carbon Dioxide|Argon,2,Science,,easy
+true_false,Sound cannot travel through a vacuum,,false,Physics,,easy
+fill_in,The process of plants making food is called ____,photosynthesis|Photosynthesis,,Biology,,medium
+matching,Match animal to class.,Mammal:Human|Bird:Eagle|Reptile:Snake,,Biology,,easy
+numerical,Acceleration due to gravity on Earth (m/s^2),,9.8,Physics,,medium

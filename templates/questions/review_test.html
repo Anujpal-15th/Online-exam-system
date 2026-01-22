@@ -1,0 +1,63 @@
+{% extends 'dashboards/student_base.html' %}
+{% block title %}Review - {{ attempt.test.title }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-clipboard-check"></i> Review: {{ attempt.test.title }}</h1>
+</div>
+
+<div class="custom-card">
+  <div class="mb-3">
+    <span class="badge badge-secondary"><i class="fas fa-hashtag"></i> Attempt #{{ attempt.attempt_number }}</span>
+    {% if attempt.total_score is not None %}
+      <span class="badge badge-primary" style="color: white;"><i class="fas fa-star"></i> Score: {{ attempt.total_score }}/{{ attempt.max_score }}</span>
+    {% endif %}
+  </div>
+  {% if locked %}
+    <div class="alert alert-info">
+      <i class="fas fa-lock"></i> Review for this test will be available after the test window closes.
+    </div>
+  {% else %}
+    <div class="mb-3">
+      <p class="text-muted"><i class="fas fa-calendar"></i> Submitted: {{ attempt.submitted_at|date:"M d, Y h:i A"|default:"—" }}</p>
+      <p class="text-muted"><i class="fas fa-clock"></i> Time spent: {{ attempt.time_spent_seconds|default:0 }} seconds</p>
+    </div>
+    {% if rows %}
+      <ol class="list-group list-group-numbered">
+        {% for row in rows %}
+          <li class="list-group-item">
+            <div class="fw-semibold">{{ row.question.question_text }}</div>
+            <div class="text-muted small mb-2">
+              Points: {{ row.points }}
+              {% if row.is_objective and row.correct != None %}
+                · {% if row.correct %}<span class="badge badge-success"><i class="fas fa-check"></i> Correct</span>{% else %}<span class="badge badge-danger"><i class="fas fa-times"></i> Incorrect</span>{% endif %}
+              {% endif %}
+            </div>
+            <div><span class="fw-semibold">Your answer:</span>
+              {% if row.answer and row.answer.answer_text %}
+                <div class="mt-1">{{ row.answer.answer_text|linebreaksbr }}</div>
+              {% else %}
+                <span class="text-muted">No answer provided.</span>
+              {% endif %}
+              {% if row.answer and row.answer.score != None %}
+                <div class="mt-1 small text-muted">Score: {{ row.answer.score }} / {{ row.points }}</div>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> No answers found to review.</div>
+    {% endif %}
+  {% endif %}
+</div>
+
+<div class="mt-4">
+  <a class="btn btn-primary" href="{% url 'student_dashboard' %}">
+    <i class="fas fa-home"></i> Back to Dashboard
+  </a>
+  <a class="btn btn-secondary" href="{% url 'student_all_exams' %}" style="margin-left: 10px;">
+    <i class="fas fa-list"></i> All Tests
+  </a>
+</div>
+{% endblock %}

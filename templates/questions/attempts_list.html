@@ -1,0 +1,107 @@
+{% extends 'dashboards/teacher_base.html' %}
+{% block title %}Attempts - {{ test.title }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-users"></i> Test Attempts</h1>
+</div>
+
+<div class="custom-card" style="margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="margin: 0; color: #667eea; font-size: 24px;">
+                <i class="fas fa-file-alt"></i> {{ test.title }}
+            </h2>
+            <p style="color: #666; margin-top: 5px; font-size: 14px;">
+                {% if test.subject %}<i class="fas fa-book"></i> {{ test.subject }} • {% endif %}
+                <i class="fas fa-calendar"></i> Created {{ test.created_at|date:"M d, Y" }}
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'tests_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Tests
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="custom-card">
+    <h3 style="color: #667eea; margin-bottom: 20px;">
+        <i class="fas fa-list-alt"></i> All Attempts 
+        <span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 14px; border-radius: 16px; font-size: 14px;">
+            {{ attempts|length }}
+        </span>
+    </h3>
+    
+    {% if attempts %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <tr>
+                    <th style="padding: 15px;"><i class="fas fa-hashtag"></i> #</th>
+                    <th style="padding: 15px;"><i class="fas fa-user"></i> Student</th>
+                    <th style="padding: 15px; text-align: center;"><i class="fas fa-redo"></i> Attempt</th>
+                    <th style="padding: 15px; text-align: center;"><i class="fas fa-play"></i> Started</th>
+                    <th style="padding: 15px; text-align: center;"><i class="fas fa-stop"></i> Submitted</th>
+                    <th style="padding: 15px; text-align: center;"><i class="fas fa-star"></i> Score</th>
+                    <th style="padding: 15px; text-align: center;"><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in attempts %}
+                <tr style="border-bottom: 1px solid #f0f0f0; transition: background 0.2s;" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                    <td style="padding: 15px;"><strong>{{ forloop.counter }}</strong></td>
+                    <td style="padding: 15px;">
+                        <div style="font-weight: 600; color: #333;">{{ a.student.username }}</div>
+                        <div style="font-size: 12px; color: #999;">{{ a.student.email }}</div>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        <span class="badge bg-info">Attempt #{{ a.attempt_number }}</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center; font-size: 13px;">
+                        {{ a.started_at|date:"M d, Y" }}<br>
+                        <span style="color: #999;">{{ a.started_at|date:"h:i A" }}</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center; font-size: 13px;">
+                        {% if a.is_submitted %}
+                            {{ a.submitted_at|date:"M d, Y" }}<br>
+                            <span style="color: #999;">{{ a.submitted_at|date:"h:i A" }}</span>
+                        {% else %}
+                            <span class="badge bg-warning"><i class="fas fa-hourglass-half"></i> In Progress</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        {% if a.total_score != None %}
+                            <span style="font-size: 20px; font-weight: bold; color: #28a745;">{{ a.total_score }}</span>
+                            <span style="color: #999; font-size: 12px;">/ {{ test.total_marks }}</span>
+                        {% else %}
+                            <span style="color: #999;">—</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <a href="{% url 'review_test' a.id %}" class="btn btn-sm btn-primary" title="Review Answers">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'grade_attempt' a.id %}" class="btn btn-sm btn-success" title="Grade Attempt">
+                                <i class="fas fa-graduation-cap"></i> Grade
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 60px 20px; color: #999;">
+        <i class="fas fa-inbox" style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;"></i>
+        <p style="font-size: 18px; margin: 0;">No attempts yet.</p>
+        <p style="font-size: 14px; margin-top: 10px;">Students haven't taken this test yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<a href="{% url 'teacher_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>
+{% endblock %}

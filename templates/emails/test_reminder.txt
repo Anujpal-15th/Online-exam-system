@@ -1,0 +1,18 @@
+Hello {{ student.get_full_name }},
+
+REMINDER: Test Deadline Approaching!
+
+Test: {{ test.title }}
+Subject: {{ test.subject }}
+Time Remaining: {{ hours_remaining }} hours
+
+{% if test.end_at %}
+Deadline: {{ test.end_at|date:"F d, Y - g:i A" }}
+{% endif %}
+
+Don't forget to complete your test before the deadline!
+
+Log in to {{ site_name }} now to take the test.
+
+Best regards,
+The {{ site_name }} Team

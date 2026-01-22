@@ -1,0 +1,82 @@
+{% extends 'dashboards/student_base.html' %}
+{% load static %}
+{% block title %}Leaderboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/leaderboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- <div class="page-header" style="text-align: center;">
+    <h1><i class="fas fa-trophy"></i> Global Leaderboard</h1>
+</div> -->
+
+{% if leaderboard %}
+<div class="custom-card leaderboard-container">
+    <table class="leaderboard-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Student</th>
+                <th style="text-align: center;">Tests Taken</th>
+                <th style="text-align: center;">Average Score</th>
+                <th style="text-align: center;">Total Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in leaderboard %}
+            <tr>
+                <!-- Rank -->
+                <td>
+                    {% if forloop.counter == 1 %}
+                        <i class="fas fa-trophy rank-icon-gold"></i>
+                    {% elif forloop.counter == 2 %}
+                        <i class="fas fa-medal rank-icon-silver"></i>
+                    {% elif forloop.counter == 3 %}
+                        <i class="fas fa-medal rank-icon-bronze"></i>
+                    {% else %}
+                        #{{ forloop.counter }}
+                    {% endif %}
+                </td>
+
+                <!-- Student -->
+                <td>
+                    {{ entry.student__username }}
+                    {% if entry.student__id == current_user_id %}
+                        <span class="you-badge">(You)</span>
+                    {% endif %}
+                </td>
+
+                <!-- Tests -->
+                <td style="text-align:center;">
+                    {{ entry.total_tests }}
+                </td>
+
+                <!-- Average Score -->
+                <td class="avg-score" style="text-align:center;">
+                    {{ entry.avg_score|floatformat:2 }}
+                </td>
+
+                <!-- Total Score -->
+                <td style="text-align:center;">
+                    {{ entry.total_score_sum }}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-trophy fa-4x"></i>
+    <p>No leaderboard data available yet.</p>
+</div>
+{% endif %}
+    
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{% url 'student_dashboard' %}" class="back-link">← Back to Dashboard</a>
+</div>
+</div>
+{% endblock %}

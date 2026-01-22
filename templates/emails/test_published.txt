@@ -1,0 +1,22 @@
+Hello {{ student.get_full_name }},
+
+A new test has been published and is now available for you!
+
+Test Details:
+-------------
+Title: {{ test.title }}
+Subject: {{ test.subject }}
+Duration: {{ test.duration_minutes }} minutes
+Total Marks: {{ test.total_marks }}
+
+{% if test.start_at %}
+Start Time: {{ test.start_at|date:"F d, Y - g:i A" }}
+{% endif %}
+{% if test.end_at %}
+End Time: {{ test.end_at|date:"F d, Y - g:i A" }}
+{% endif %}
+
+Log in to {{ site_name }} to take this test.
+
+Best regards,
+The {{ site_name }} Team
